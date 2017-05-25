@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<beans xmlns="http://www.springframework.org/schema/beans"  
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"   
+    xmlns:context="http://www.springframework.org/schema/context"  
+    xmlns:aop="http://www.springframework.org/schema/aop"  
+    xmlns:tx="http://www.springframework.org/schema/tx"  
+    xsi:schemaLocation="http://www.springframework.org/schema/beans  
+           http://www.springframework.org/schema/beans/spring-beans-4.0.xsd  
+           http://www.springframework.org/schema/aop   
+           http://www.springframework.org/schema/aop/spring-aop-4.0.xsd  
+           http://www.springframework.org/schema/tx  
+           http://www.springframework.org/schema/tx/spring-tx-4.0.xsd  
+           http://www.springframework.org/schema/context  
+           http://www.springframework.org/schema/context/spring-context-4.0.xsd
+           http://java.sun.com/xml/ns/javaee
+           http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
+  
+  
+    <import resource="classpath:spring-mybatis.xml"/>
+    <import resource="classpath:spring-pool.xml"/>
+    <!-- 采用注释的方式配置bean -->
+    <context:annotation-config />    
+    <!-- 配置要扫描的包 -->    
+    <context:component-scan base-package="com.spiderdt.common"></context:component-scan>
+    <bean id="appProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+        <property name="locations">
+            <list>
+                <value>classpath:filters/common.properties</value>
+            </list>
+        </property>
+    </bean>
+    <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PreferencesPlaceholderConfigurer">
+        <property name="properties" ref="appProperties" />
+    </bean>
+  
+</beans> 

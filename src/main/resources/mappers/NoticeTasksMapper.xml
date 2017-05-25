@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.spiderdt.common.notice.dao.NoticeTasksDao">
+
+	<resultMap id="TaskResultMap" type="com.spiderdt.common.notice.entity.NoticeTasksEntity">
+		<result column="task_id" property="taskId" jdbcType="NUMERIC" />
+		<result column="parent_task_id" property="parentTaskId" jdbcType="NUMERIC" />
+		<result column="task_type" property="taskType" jdbcType="VARCHAR" />
+		<result column="client_id" property="clientId" jdbcType="VARCHAR" />
+		<result column="user_id" property="userId" jdbcType="VARCHAR" />
+		<result column="addresses" property="addresses" jdbcType="VARCHAR" />
+		<result column="message" property="message" jdbcType="VARCHAR" />
+		<result column="status" property="status" jdbcType="VARCHAR" />
+		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
+		<result column="update_time" property="updateTime" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<select id="getNewNoticeTask" resultMap="TaskResultMap">
+		select * from notice_tasks where task_type= #{task_type} and status ='new' limit 1;
+	</select>
+	<select id="getNewNoticeTasks" resultMap="TaskResultMap">
+		select * from notice_tasks where status ='new' and task_type=#{task_type};
+	</select>
+	<select id="getNoticeTasksByStatus" resultMap="TaskResultMap" parameterType="String">
+		select * from notice_tasks where status =#{status};
+	</select>
+	<insert id="createNoticeTask" parameterType="com.spiderdt.common.notice.entity.NoticeTasksEntity" useGeneratedKeys="true" keyProperty="task_id">
+		insert into notice_tasks
+		(parent_task_id,task_type,client_id,user_id,addresses,message,status,create_time,update_time)
+		values
+		(#{parentTaskId},#{taskType},#{clientId},#{userId},#{addresses}
+		,#{message},#{status}, #{createTime},#{updateTime});
+	</insert>
+    <update id="updateNoticeTaskStatus">
+		update notice_tasks
+		set status=#{status},update_time=#{update_time}
+		where task_id =#{task_id};
+	</update>
+</mapper>

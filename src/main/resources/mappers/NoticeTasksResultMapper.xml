@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.spiderdt.common.notice.dao.NoticeTasksDao">
+
+    <resultMap id="TTaskResultMap" type="com.spiderdt.common.notice.entity.NoticeTasksEntity">
+        <result column="task_id" property="taskId" jdbcType="NUMERIC" />
+        <result column="parent_task_id" property="parentTaskId" jdbcType="NUMERIC" />
+        <result column="task_type" property="taskType" jdbcType="VARCHAR" />
+        <result column="client_id" property="clientId" jdbcType="VARCHAR" />
+        <result column="user_id" property="userId" jdbcType="VARCHAR" />
+        <result column="addresses" property="addresses" jdbcType="VARCHAR" />
+        <result column="message" property="message" jdbcType="VARCHAR" />
+        <result column="status" property="status" jdbcType="VARCHAR" />
+        <result column="create_time" property="createTime" jdbcType="VARCHAR" />
+        <result column="update_time" property="updateTime" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <insert id="createNoticeTaskResultBatch" parameterType="java.util.List">
+        insert into notice_tasks_result_info
+        (task_id,msgid,address,status,is_received,submit_time)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+                (#{item.taskId},#{item.msgid},#{item.address},#{item.status},#{item.isReceived},#{item.submitTime})
+        </foreach>
+    </insert>
+
+
+
+
+
+</mapper>
