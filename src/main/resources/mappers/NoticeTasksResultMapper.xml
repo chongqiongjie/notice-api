@@ -23,9 +23,22 @@
                 (#{item.taskId},#{item.msgid},#{item.address},#{item.status},#{item.isReceived},#{item.submitTime})
         </foreach>
     </insert>
+    <update id="updateNoticeTaskResultStatus">
+        update notice_tasks_result_info
+        set status=#{status},
+        detail_info=#{detail_info},
+        send_time=#{send_time}
+        submit_time=#{submit_time}
+        where task_id =#{task_id} and msgid=#{msgid};
+    </update>
 
-
-
+    <update id="updateNoticeTaskBackInfoStatus">
+        update notice_tasks_result_info
+        set status=#{status},
+        detail_info=#{detail_info},
+        back_time=#{back_time}
+        where msgid=#{msgid};
+    </update>
 
 
 </mapper>

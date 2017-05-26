@@ -46,4 +46,25 @@ public interface NoticeTasksDao {
     public Boolean updateNoticeTaskStatus(@Param("task_id") Integer task_id,
                                           @Param("status") String status,
                                           @Param("update_time") String update_time);
+
+    /**
+     * 根据返回的信息，更新result表
+     * @param task_id
+     * @param msgid
+     * @param status
+     * @param detail_info
+     * @param send_time
+     * @param submit_time
+     * @return
+     */
+    public Boolean updateNoticeTaskResultStatus(@Param("task_id") Integer task_id,
+                                          @Param("msgid") String msgid,
+                                          @Param("status") String status,
+                                          @Param("detail_info") String detail_info,
+                                          @Param("send_time") String send_time,
+                                          @Param("submit_time") String submit_time);
+    public Boolean updateNoticeTaskBackInfoStatus( @Param("msgid") String msgid,
+                                                @Param("status") String status,
+                                                @Param("detail_info") String detail_info,
+                                                @Param("back_time") String back_time);
 }

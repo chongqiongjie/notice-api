@@ -6,9 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.spiderdt.common.notice.common.Jdate;
 import com.spiderdt.common.notice.common.Jlog;
 import com.spiderdt.common.notice.dao.NoticeTasksDao;
-import com.spiderdt.common.notice.entity.NoticeTasksEntity;
-import com.spiderdt.common.notice.entity.NoticeTasksResultEntity;
-import com.spiderdt.common.notice.entity.SmsReqEntity;
+import com.spiderdt.common.notice.entity.*;
 import com.spiderdt.common.notice.task.DefaultSmsSendTask;
 import com.spiderdt.common.notice.task.SmsRunTask;
 import org.slf4j.Logger;
@@ -44,17 +42,23 @@ public class SmsService {
         Jlog.info("get task list from db: count:"+task_list.size());
         if(task_list.size() > 0){
             for(NoticeTasksEntity item: task_list) {
-                updateNoticeTaskSatus(item.getTaskId(),"initing");
-                Jlog.info("start init task resutl info"+item.getTaskId());
-                SmsReqEntity smsReqEntity = getReqEntity(item.getAddresses(),item.getMessage());
-                Jlog.info("sms req entity ok:"+item.getTaskId());
+                Integer task_id = item.getTaskId();
+                updateNoticeTaskSatus(task_id,"initing");
+                Jlog.info("start init task resutl info:"+task_id);
+                List<SmsReqEntity.SmsMsgEntity> smsMsgEntitys = getMsgEntitys(item.getAddresses(),item.getMessage());
+                Jlog.info("sms msg entity ok:"+task_id);
                 List<NoticeTasksResultEntity> noticeTasksResultEntities = createNoticeResultEntity(
-                        item.getTaskId(),smsReqEntity.getData());
-                Jlog.info("sms task result info ok:"+item.getTaskId());
-                saveNoticeResultsBatch(noticeTasksResultEntities);
-                Jlog.info("save sms task result to db OK:"+item.getTaskId());
-                updateNoticeTaskSatus(item.getTaskId(),"inited");
-                sendMsgToHttpClient(item.getTaskId(),smsReqEntity);
+                        task_id,smsMsgEntitys);
+                Jlog.info("sms task result info ok:"+task_id);
+                Boolean st = saveNoticeResultsBatch(noticeTasksResultEntities);
+                if(st == true) {
+                    Jlog.info("save sms task result to db OK:" + task_id);
+                    updateNoticeTaskSatus(task_id, "inited");
+                    sendMsgToHttpClient(task_id, smsMsgEntitys);
+                }else{
+                    Jlog.error("save sms task result to db error:"+task_id);
+                    updateNoticeTaskSatus(task_id, "failed");
+                }
             }
         }
     }
@@ -67,10 +71,9 @@ public class SmsService {
      * @return
      */
 
-    public SmsReqEntity getReqEntity(String addresses,String message){
+    public List<SmsReqEntity.SmsMsgEntity> getMsgEntitys(String addresses,String message){
         JSONArray addes = null;
         String reserve_key = "phone";
-        SmsReqEntity smsReqEntity = new SmsReqEntity();
         List<SmsReqEntity.SmsMsgEntity> msgList = new ArrayList<SmsReqEntity.SmsMsgEntity>();
         try {
             addes = JSON.parseArray(addresses);
@@ -103,11 +106,7 @@ public class SmsService {
                 msgList.add(smsMsgEntity);
             }
         }
-        smsReqEntity.setData(msgList);
-        smsReqEntity.setAccout("");
-        smsReqEntity.setPassword("");
-
-        return smsReqEntity;
+        return msgList;
     }
 
     /**
@@ -224,16 +223,68 @@ public class SmsService {
     /**
      * 调用http请求，发送短信
      * @param task_id
-     * @param smsReqEntity
+     * @param smsMsgEntitys
      * @return
      */
-    public Boolean sendMsgToHttpClient(Integer task_id,SmsReqEntity smsReqEntity){
+    public Boolean sendMsgToHttpClient(Integer task_id,List<SmsReqEntity.SmsMsgEntity> smsMsgEntitys){
         Jlog.info("call  sms service begin:"+task_id);
         SmsRunTask smsRunTask = new DefaultSmsSendTask(task_id);
-        smsRunTask.setMsg(smsReqEntity);
+        smsRunTask.setMsg(smsMsgEntitys);
         taskPool.execute(smsRunTask);
         Jlog.info("call  sms service end:"+task_id);
         return true;
 
+    }
+
+    /**
+     * 根据每个批次发送的短信，更新数据结果
+     * @param rets
+     * @return
+     */
+    public Boolean dealSmsResultStatus(Integer task_id,JSONObject rets){
+        Jlog.info("deal sms result:"+rets.toJSONString());
+        Boolean st = true;
+        SmsRespEntity smsRespEntity = JSONObject.toJavaObject(rets,SmsRespEntity.class);
+        String send_time = Jdate.getNowStrTime();
+        try {
+            if (smsRespEntity.getResult().equals("0") == true) {
+                if (smsRespEntity.getData().size() > 0) {
+                    List<SmsRespEntity.SmsRespDataEntity> items = smsRespEntity.getData();
+                    for (SmsRespEntity.SmsRespDataEntity item : items) {
+                        noticeTasksDao.updateNoticeTaskResultStatus(task_id,
+                                item.getMsgid(),
+                                item.getStatus(),
+                                item.getDesc(),
+                                send_time, send_time);
+                    }
+
+                }
+
+            }
+        }catch(Exception ee){
+            Jlog.error(" update sms result error:"+ee.getMessage());
+            st = false;
+        }
+        return st;
+    }
+    public Boolean dealSmsResultReportStatus(JSONObject rets){
+        SmsReportEntity smsReportEntity = JSONObject.toJavaObject(rets,SmsReportEntity.class);
+        Boolean st = true;
+        String back_time = Jdate.getNowStrTime();
+        try{
+            if(smsReportEntity.getResult().equals("0") == true){
+                if(smsReportEntity.getReports().size() > 0){
+                    List<SmsReportEntity.SmsReportInfoEntity> items = smsReportEntity.getReports();
+                    for(SmsReportEntity.SmsReportInfoEntity item:items){
+                        noticeTasksDao.updateNoticeTaskBackInfoStatus(item.getMsgid(),
+                                item.getStatus(),item.getDesc(),back_time);
+                    }
+                }
+            }
+        }catch(Exception ee){
+            Jlog.error("deal sms result report error:"+ee.getMessage());
+            st = false;
+        }
+        return st;
     }
 }

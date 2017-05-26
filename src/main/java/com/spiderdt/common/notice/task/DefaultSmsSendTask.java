@@ -15,11 +15,13 @@ import java.util.List;
  * Created by fivebit on 2017/5/23.
  */
 public class DefaultSmsSendTask implements  SmsRunTask{
-    private SmsReqEntity smsReqEntity;
+    private List<SmsReqEntity.SmsMsgEntity> smsMsgEntitys;
     private Integer task_id;
     private Integer sms_batch = 10;     //每批发送10条短信
     private static ApplicationContext ctx = null;
     private static String sms_host_url = "http://www.dh3t.com/json/sms/BatchSubmit";
+    private String account = "";
+    private String password = "";
     public DefaultSmsSendTask(Integer task_id){
         if(ctx == null){
             ctx = new ClassPathXmlApplicationContext("applicationContext.xml");
@@ -28,7 +30,7 @@ public class DefaultSmsSendTask implements  SmsRunTask{
     }
     @Override
     public void setMsg(Object msg) {
-        smsReqEntity = (SmsReqEntity) msg;
+        smsMsgEntitys = (List<SmsReqEntity.SmsMsgEntity>) msg;
     }
 
     @Override
@@ -51,11 +53,14 @@ public class DefaultSmsSendTask implements  SmsRunTask{
         Jlog.info("start  send sms task :"+task_id);
         SmsService smsService = (SmsService) ctx.getBean("smsService");
         smsService.updateNoticeTaskSatus(task_id,"sending");
-        List<SmsReqEntity.SmsMsgEntity> lists = smsReqEntity.getData();
         SmsReqEntity sendEntity = new SmsReqEntity();
-        sendEntity.setPassword(smsReqEntity.getPassword());
-        sendEntity.setAccout(smsReqEntity.getAccout());
-        int list_size = lists.size();
+        sendEntity.setPassword(password);
+        sendEntity.setAccout(account);
+        if(smsMsgEntitys.size() == 0){
+            Jlog.error("send sms task entity empty:"+task_id);
+            return;
+        }
+        int list_size = smsMsgEntitys.size();
         float fsize = (float) sms_batch;
         int count = (int) Math.ceil(list_size/fsize);
         try {
@@ -64,9 +69,11 @@ public class DefaultSmsSendTask implements  SmsRunTask{
                 if (end > list_size) {
                     end = list_size;
                 }
-                List<SmsReqEntity.SmsMsgEntity> patch = lists.subList(i * sms_batch, end);
+                List<SmsReqEntity.SmsMsgEntity> patch = smsMsgEntitys.subList(i * sms_batch, end);
                 sendEntity.setData(patch);
-                JSONObject ret = JhttpClient.httpPost("",(JSONObject) JSON.toJSON(sendEntity));
+                JSONObject ret = JhttpClient.httpPost(sms_host_url,(JSONObject) JSON.toJSON(sendEntity));
+                Jlog.info("http post return:"+ret.toJSONString());
+                smsService.dealSmsResultStatus(task_id,ret);
             }
         }catch (Exception ee){
             Jlog.error("send notice error:"+ee.getMessage());
