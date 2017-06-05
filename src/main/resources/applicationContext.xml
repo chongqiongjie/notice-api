@@ -26,6 +26,7 @@
         <property name="locations">
             <list>
                 <value>classpath:filters/common.properties</value>
+                <value>classpath:filters/${profiles.active}/app.properties</value>
             </list>
         </property>
     </bean>

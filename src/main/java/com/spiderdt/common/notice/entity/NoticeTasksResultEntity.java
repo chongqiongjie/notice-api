@@ -8,6 +8,7 @@ import java.io.Serializable;
 public class NoticeTasksResultEntity implements Serializable {
 
     private static final long serialVersionUID = -8039686696076337053L;
+    private Integer rid;
     private Integer taskId ;
     private String msgid ;
     private String address ;

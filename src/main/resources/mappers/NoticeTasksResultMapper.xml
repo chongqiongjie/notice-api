@@ -39,6 +39,18 @@
         back_time=#{back_time}
         where msgid=#{msgid};
     </update>
+    <update id="updateNoticeTaskTrackInfo">
+        update notice_tasks_result_info
+        <choose>
+            <when test="ac='show'">
+                set is_open=#{status},open_time=#{atime}
+            </when>
+            <when test="ac='click'">
+                set is_click=#{status},open_time=#{atime}
+            </when>
+        </choose>
+        where rid=#{rid};
+    </update>
 
 
 </mapper>

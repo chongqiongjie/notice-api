@@ -1,9 +1,13 @@
 package com.spiderdt.common.notice.common;
 
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -112,5 +116,74 @@ public class Utils {
         }
         return String.valueOf(ret_char);
     }
+
+    /**
+     * 合并两个map
+     * @param src
+     * @param dest
+     * @return
+     */
+    public static Map<String,String> mergMap(Map<String,String> src,List<Map<String,String>> dest){
+        if(src == null ){
+            src = new HashMap<String,String>();
+        }
+        if(dest == null){
+            return src;
+        }
+        for(Map<String,String> item:dest){
+            for(Map.Entry<String,String> _set:item.entrySet()){
+                src.put(_set.getKey(),_set.getValue());
+            }
+        }
+        return src;
+
+    }
+
+    /***
+     * 合并两个map.
+     * @param src
+     * @param dest
+     * @return
+     */
+    public static Map<String,String> mergMap(Map<String,String> src,Map<String,String> dest){
+        if(src == null ){
+            src = new HashMap<String,String>();
+        }
+        if(dest == null){
+            return src;
+        }
+        for(Map.Entry<String,String> _set:dest.entrySet()){
+            src.put(_set.getKey(),_set.getValue());
+        }
+        return src;
+
+    }
+
+    /**
+     * 从map转成对应的json object
+     * @param srcmap
+     * @return
+     */
+    public static JSONObject map2Json(Map<String,String> srcmap){
+        JSONObject json_map = new JSONObject();
+        if(srcmap != null) {
+            for (Map.Entry<String, String> entry : srcmap.entrySet()) {
+                json_map.put(entry.getKey(), entry.getValue());
+            }
+        }
+        return json_map;
+    }
+
+    public static Map<String,String> json2map(JSONObject srcjson){
+        Map<String,String> map_json = Maps.newHashMap();
+        if(srcjson != null){
+            for(Map.Entry<String, Object> entry: srcjson.entrySet()) {
+                map_json.put(entry.getKey(), entry.getValue().toString());
+            }
+        }
+        return map_json;
+    }
+
+
 
 }
