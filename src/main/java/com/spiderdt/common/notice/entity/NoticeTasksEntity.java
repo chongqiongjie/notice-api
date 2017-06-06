@@ -1,5 +1,8 @@
 package com.spiderdt.common.notice.entity;
 
+import com.spiderdt.common.notice.common.Jdate;
+import com.spiderdt.common.notice.resource.interfactBean.TaskInput;
+
 import java.io.Serializable;
 
 /**
@@ -18,6 +21,17 @@ public class NoticeTasksEntity implements Serializable {
     private String status ;
     private String createTime ;
     private String updateTime ;
+    public void initByTaskInput(TaskInput input){
+        this.parentTaskId = 0;
+        this.taskType = input.getTaskType();
+        this.clientId = input.getClientId();
+        this.userId = input.getUserId();
+        this.addresses = input.getAddresses();
+        this.message = input.getMessage();
+        this.status = "new";
+        this.createTime = Jdate.getNowStrTime();
+        this.updateTime = Jdate.getNowStrTime();
+    }
 
     public static long getSerialVersionUID() {
         return serialVersionUID;

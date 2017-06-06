@@ -67,7 +67,7 @@ public interface NoticeTasksDao {
                                                 @Param("status") String status,
                                                 @Param("detail_info") String detail_info,
                                                 @Param("back_time") String back_time);
-    public Boolean updateNoticeTaskTrackInfo(@Param("rid") Integer rid,
+    public Boolean updateNoticeTaskTrackInfo(@Param("track_url_suffix") String track_url_suffix,
                                              @Param("ac") String ac,
                                              @Param("status") String status,
                                              @Param("atime") String atime);

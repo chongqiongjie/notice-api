@@ -20,7 +20,7 @@ public class Jurl {
 
     public static String makeShortUrl(String url){
 
-        return null;
+        return "http://qiong.com";
     }
     public static Map<String,String> makeShortUrls(List<String> urls){
         return null;

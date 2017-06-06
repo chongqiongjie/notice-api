@@ -25,6 +25,8 @@ public class UrlService {
     private TrackRecodeDao trackRecodeDao;
     @Resource
     private NoticeTasksDao noticeTasksDao;
+    @Resource
+    private BitlyService bitlyService;
     /**
      * 批量制作track url
      * @param params
@@ -33,9 +35,13 @@ public class UrlService {
      * return Map<src_url:track_url>
      * 还包括两个逻辑：存数据库和redis
      */
-    public Map<String,String> makeTrackUrl(List<Map<String,String>> params){
+    public Map<String,String> makeTrackUrlPair(List<Map<String,String>> params){
 
         return null;
+    }
+    public String makeShortUrl(String url){
+        String short_url = bitlyService.getShortUrl(url);
+        return short_url;
     }
 
     /**
@@ -43,7 +49,7 @@ public class UrlService {
      * @param param
      * @return
      */
-    public Map<String,String> makeTrackUrl(Map<String,String> param){
+    public Map<String,String> makeTrackUrlPair(Map<String,String> param){
         Map<String,String> pair_ret = null;
         if(param.containsKey("dest_url") == false){
             Jlog.error("make rtrack url param error:"+param.toString());
@@ -51,11 +57,11 @@ public class UrlService {
         }
         String dest_url = param.get("dest_url");
         param.remove("dest_url");
-        String trak_url_suffix = Jurl.makeTrackUrlSuffix(dest_url,param);
+        String track_url_suffix = Jurl.makeTrackUrlSuffix(dest_url,param);
         pair_ret = Maps.newHashMap();
-        pair_ret.put(dest_url,trak_url_suffix);
+        pair_ret.put(dest_url,track_url_suffix);
 
-        saveTrackPairUrlToRedis(dest_url,trak_url_suffix,param);
+        saveTrackPairUrlToRedis(dest_url,track_url_suffix,param);
 
         return pair_ret;
 
@@ -99,6 +105,7 @@ public class UrlService {
         Map<String,String> org_url_and_params = null;
         try {
             encrypt_org_info = JredisClient.getString(encrypt_redis_key);
+            Jlog.debug("get from redis:"+encrypt_redis_key+" value:"+encrypt_org_info);
             if(encrypt_org_info != null) {
                 JSONObject encrypt_org_json = JSONObject.parseObject(encrypt_org_info);
                 org_url_and_params = Utils.json2map(encrypt_org_json);
@@ -106,7 +113,7 @@ public class UrlService {
         }catch(Exception ee){
             Jlog.error("get org info by track url error:"+ee.getMessage());
         }
-        if(org_url_and_params != null){
+        if(org_url_and_params == null){
             TrackRecodeEntity trackRecodeEntity = getTrackRecodeByEncrypt(encrypt_code);
             org_url_and_params = trackRecodeEntity.getMapParams();
             org_url_and_params.put("org_url",trackRecodeEntity.getUrlOrg());
@@ -125,12 +132,11 @@ public class UrlService {
     }
 
     public Boolean updateTaskResultByTrackInfo(Map<String,String> track_info){
-        Integer rid = Integer.parseInt(track_info.get("rid"));
+        String track_url_suffix = track_info.get("track_url_suffix");
         String sc = track_info.get("sc");
         String ac = track_info.get("ac");
-        String encrypt_url = track_info.get("url_encode");
-        trackRecodeDao.updateTrackRecodeStatus(encrypt_url,1);
-        noticeTasksDao.updateNoticeTaskTrackInfo(rid,ac,"1",Jdate.getNowStrTime());
+        trackRecodeDao.updateTrackRecodeStatus(track_url_suffix,1);
+        noticeTasksDao.updateNoticeTaskTrackInfo(track_url_suffix,ac,"1",Jdate.getNowStrTime());
         return true;
     }
 

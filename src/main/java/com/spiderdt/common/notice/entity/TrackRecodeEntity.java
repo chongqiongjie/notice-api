@@ -9,9 +9,11 @@ import java.util.Map;
 public class TrackRecodeEntity implements Serializable {
 
     private static final long serialVersionUID = -8039686696076337053L;
-
-    private String urlEncode;
+    private Integer taskId;
+    private String trackUrlSuffix;
     private String urlOrg;
+    private String messageReplace;
+    private String messageOrg;
     private String params;
     private Map<String,String> mapParams;
     private Integer status;
@@ -19,12 +21,47 @@ public class TrackRecodeEntity implements Serializable {
     @Override
     public String toString() {
         return "TrackRecodeEntity{" +
-                "urlEncode='" + urlEncode + '\'' +
+                "taskId=" + taskId +
+                ", trackUrlSuffix='" + trackUrlSuffix + '\'' +
                 ", urlOrg='" + urlOrg + '\'' +
+                ", messageReplace='" + messageReplace + '\'' +
+                ", messageOrg='" + messageOrg + '\'' +
                 ", params='" + params + '\'' +
                 ", mapParams=" + mapParams +
                 ", status=" + status +
                 '}';
+    }
+
+    public Integer getTaskId() {
+        return taskId;
+    }
+
+    public void setTaskId(Integer taskId) {
+        this.taskId = taskId;
+    }
+
+    public String getMessageReplace() {
+        return messageReplace;
+    }
+
+    public void setMessageReplace(String messageReplace) {
+        this.messageReplace = messageReplace;
+    }
+
+    public String getTrackUrlSuffix() {
+        return trackUrlSuffix;
+    }
+
+    public void setTrackUrlSuffix(String trackUrlSuffix) {
+        this.trackUrlSuffix = trackUrlSuffix;
+    }
+
+    public String getMessageOrg() {
+        return messageOrg;
+    }
+
+    public void setMessageOrg(String messageOrg) {
+        this.messageOrg = messageOrg;
     }
 
     public Integer getStatus() {
@@ -37,14 +74,6 @@ public class TrackRecodeEntity implements Serializable {
 
     public static long getSerialVersionUID() {
         return serialVersionUID;
-    }
-
-    public String getUrlEncode() {
-        return urlEncode;
-    }
-
-    public void setUrlEncode(String urlEncode) {
-        this.urlEncode = urlEncode;
     }
 
     public String getUrlOrg() {

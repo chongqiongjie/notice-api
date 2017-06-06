@@ -3,27 +3,31 @@
 <mapper namespace="com.spiderdt.common.notice.dao.TrackRecodeDao">
 
     <resultMap id="TrackRecodeResultMap" type="com.spiderdt.common.notice.entity.TrackRecodeEntity">
-        <result column="url_encode" property="urlEncode" jdbcType="VARCHAR" />
+        <result column="track_url_suffix" property="trackUrlSuffix" jdbcType="VARCHAR" />
         <result column="url_org" property="urlOrg" jdbcType="VARCHAR" />
+        <result column="task_id" property="taskId" jdbcType="NUMERIC" />
+        <result column="message_replace" property="messageReplace" jdbcType="VARCHAR" />
+        <result column="message_org" property="messageOrg" jdbcType="VARCHAR" />
         <result column="params" property="params" jdbcType="VARCHAR" />
         <result column="status" property="status" jdbcType="NUMERIC" />
     </resultMap>
 
     <insert id="addTrackRecodeInfoBatch" parameterType="java.util.List">
         insert into notice_tasks_track_recode
-        (url_encode,url_org,params)
+        (task_id,track_url_suffix,url_org,message_replace,message_org,params)
         values
         <foreach collection="list" item="item" index="index" separator=",">
-            (#{item.urlEncode},#{item.urlOrg},#{item.params})
+            (#{item.taskId},#{item.trackUrlSuffix},#{item.urlOrg},
+            #{item.messageReplace},#{item.messageOrg},#{item.params})
         </foreach>
     </insert>
     <select id="getTrackRecodeInfoByEncrypt" resultMap="TrackRecodeResultMap">
-        select * from notice_tasks_track_recode where url_encode=#{encrypt_url};
+        select * from notice_tasks_track_recode where track_url_suffix=#{encrypt_url};
     </select>
     <update id="updateTrackRecodeStatus">
         update notice_tasks_track_recode
         set status=#{status}
-        where url_encode =#{encrypt_url};
+        where track_url_suffix =#{encrypt_url};
     </update>
 
 </mapper>

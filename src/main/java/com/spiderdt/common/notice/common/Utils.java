@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by fivebit on 2017/5/11.
@@ -16,6 +18,7 @@ import java.util.UUID;
  */
 public class Utils {
     private static Logger log = LoggerFactory.getLogger(Utils.class);
+
     /**
      * 检测token的格式，要符合xxxxxxxx-xxxx-xxxx-xxxxxx-xxxxxxxxxx
      * @param token
@@ -70,6 +73,7 @@ public class Utils {
     public static Boolean checkPasswordFormat(String password){
         return true;
     }
+
     public static String getRespons(int status,String code,Object data){
         JSONObject oper = new JSONObject();
         oper.put("status",status);
@@ -182,6 +186,39 @@ public class Utils {
             }
         }
         return map_json;
+    }
+
+    /**
+     * 从文本中，获取其中一个URL并返回
+     * @param message
+     * @return
+     */
+    public static String getUrlFromMessage(String message){
+        Pattern pb = Pattern.compile("(?<!\\d)(?:(?:[\\w[.-://]]*\\.[com|cn|net|tv|gov|org|biz|cc|uk|jp|edu]+[^\\s|^\\u4e00-\\u9fa5]*))");
+        Matcher mb = pb.matcher(message);
+        String url = "";
+        if(mb.find()) {
+            url = mb.group();
+        }
+        return url;
+    }
+
+    /**
+     * 对文本中的第一个URL，使用新的URL进行替换
+     * att.如果有多个URL，会出现一些不可预知的问题
+     * @param message
+     * @param new_url
+     * @return
+     */
+    public static String replaceUrlFromMessage(String message,String new_url){
+        Pattern pb = Pattern.compile("(?<!\\d)(?:(?:[\\w[.-://]]*\\.[com|cn|net|tv|gov|org|biz|cc|uk|jp|edu]+[^\\s|^\\u4e00-\\u9fa5]*))");
+        String re_message = message;
+        Matcher mb = pb.matcher(message);
+        if (mb.find()) {
+            Jlog.info("replace url:" + mb.group()+" new url:"+new_url);
+            re_message = mb.replaceAll(new_url);
+        }
+        return re_message;
     }
 
 

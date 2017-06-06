@@ -18,13 +18,18 @@ public class App
         Jlog.info("begin run notice service and get sms service");
         while(true) {
             Jlog.info("begin send sms by db scan");
-            smsService.sendSmsByDbScan();
+            try {
+                smsService.sendSmsByDbScan();
+            }catch (Exception ee){
+                Jlog.error("send sms by db scan task error:"+ee.getMessage());
+            }
             Jlog.info("end send sms by db scan and sleep....");
             try {
-                Thread.sleep(5000);
+                Thread.sleep(5000);     //sleep
             } catch (InterruptedException e) {
                 Jlog.error("sleep error:"+e.getMessage());
             }
+            Jlog.requestid = "";
         }
     }
 }

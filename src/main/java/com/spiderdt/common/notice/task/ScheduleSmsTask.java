@@ -9,7 +9,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 /**
  * Created by fivebit on 2017/5/23.
- * 例行化的脚本，没隔30秒，去获取一次短信状态。更新数据库状态。
+ * 例行化的脚本，每隔30秒，去获取一次短信状态。更新数据库状态。
  * 该短信状态，只会返回一次，且每次只会返回不超过200条。
  */
 public class ScheduleSmsTask implements Runnable {

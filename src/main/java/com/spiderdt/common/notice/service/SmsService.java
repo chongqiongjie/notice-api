@@ -3,22 +3,23 @@ package com.spiderdt.common.notice.service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.spiderdt.common.notice.common.Jdate;
 import com.spiderdt.common.notice.common.Jlog;
+import com.spiderdt.common.notice.common.Jurl;
+import com.spiderdt.common.notice.common.Utils;
 import com.spiderdt.common.notice.dao.NoticeTasksDao;
+import com.spiderdt.common.notice.dao.TrackRecodeDao;
 import com.spiderdt.common.notice.entity.*;
+import com.spiderdt.common.notice.errorhander.AppException;
 import com.spiderdt.common.notice.task.DefaultSmsSendTask;
 import com.spiderdt.common.notice.task.SmsRunTask;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Created by fivebit on 2017/5/19.
@@ -26,30 +27,36 @@ import java.util.UUID;
 @Service("smsService")
 public class SmsService {
 
-    private static Logger log = LoggerFactory.getLogger(SmsService.class);
     @Resource
     private NoticeTasksDao noticeTasksDao;
     @Resource
     private ThreadPoolTaskExecutor taskPool;
+    @Resource
+    private TrackRecodeDao trackRecodeDao;
+    @Resource
+    private UrlService urlService;
 
     private String task_type = "sms";
+    private String sign = "[知助数据]";
+    private String subcode = "";
     /**
      * 通过间隔的扫描数据库状态，获取任务,发送短息
      */
-    public void sendSmsByDbScan(){
-        String task_type = "sms";
+    public void sendSmsByDbScan() throws AppException {
         List<NoticeTasksEntity> task_list = noticeTasksDao.getNewNoticeTasks(task_type);
-        Jlog.info("get task list from db: count:"+task_list.size());
+        Jlog.info("get task list from db, count:"+task_list.size());
         if(task_list.size() > 0){
             for(NoticeTasksEntity item: task_list) {
                 Integer task_id = item.getTaskId();
                 updateNoticeTaskSatus(task_id,"initing");
                 Jlog.info("start init task resutl info:"+task_id);
                 List<SmsReqEntity.SmsMsgEntity> smsMsgEntitys = getMsgEntitys(item.getAddresses(),item.getMessage());
-                Jlog.info("sms msg entity ok:"+task_id);
+                Jlog.info("sms msg entity ok:"+task_id+" list SmsMsgEntity:"+smsMsgEntitys.toString());
                 List<NoticeTasksResultEntity> noticeTasksResultEntities = createNoticeResultEntity(
                         task_id,smsMsgEntitys);
-                Jlog.info("sms task result info ok:"+task_id);
+                Jlog.info("sms task result info ok:"+task_id+noticeTasksResultEntities.toString());
+                noticeTasksResultEntities = initSmsTrackRecode(task_id,noticeTasksResultEntities);
+                Jlog.info("sms task result info ok:"+task_id+noticeTasksResultEntities.toString());
                 Boolean st = saveNoticeResultsBatch(noticeTasksResultEntities);
                 if(st == true) {
                     Jlog.info("save sms task result to db OK:" + task_id);
@@ -71,15 +78,15 @@ public class SmsService {
      * @return
      */
 
-    public List<SmsReqEntity.SmsMsgEntity> getMsgEntitys(String addresses,String message){
+    public List<SmsReqEntity.SmsMsgEntity> getMsgEntitys(String addresses,String message) throws AppException {
         JSONArray addes = null;
         String reserve_key = "phone";
         List<SmsReqEntity.SmsMsgEntity> msgList = new ArrayList<SmsReqEntity.SmsMsgEntity>();
         try {
             addes = JSON.parseArray(addresses);
         }catch (Exception ee){
-            log.error("parse addresses error:"+addresses+" message:"+ee.getMessage());
-            return null;
+            Jlog.error("parse addresses error:"+addresses+" message:"+ee.getMessage());
+            throw new AppException("0","parse addresses error:"+addresses);
         }
         if(addes != null){
             for(Object add:addes){
@@ -87,8 +94,8 @@ public class SmsService {
                 JSONObject add_json = JSONObject.parseObject(add.toString());
                 Set<String> key_set = add_json.keySet();
                 if(key_set.contains(reserve_key) == false){
-                    log.error("addresses format is wrong:"+addresses);
-                    return null;
+                    Jlog.error("addresses format is wrong:"+addresses);
+                    throw new AppException("0","address format is error:"+addresses);
                 }
                 for(String key:key_set){
                     if(key.equals(reserve_key) == true){
@@ -100,9 +107,9 @@ public class SmsService {
                 smsMsgEntity.setContent(m_msg);
                 smsMsgEntity.setPhones(add_json.getString(reserve_key));
                 smsMsgEntity.setMsgid(UUID.randomUUID().toString().replace("-", ""));
-                smsMsgEntity.setSign("【知助数据】");
+                smsMsgEntity.setSign(sign);
                 smsMsgEntity.setSendtime("");
-                smsMsgEntity.setSubcode("");
+                smsMsgEntity.setSubcode(subcode);
                 msgList.add(smsMsgEntity);
             }
         }
@@ -118,7 +125,7 @@ public class SmsService {
      * @return task_id
      */
     public int createSmsTask(String client_id,String user_id,String addresses,String message){
-        log.info("create sms task begin");
+        Jlog.info("create sms task begin");
         int task_id = 0;
         NoticeTasksEntity noticeTasksEntity = new NoticeTasksEntity();
         noticeTasksEntity.setAddresses(addresses);
@@ -133,9 +140,9 @@ public class SmsService {
         try {
             task_id = noticeTasksDao.createNoticeTask(noticeTasksEntity);
         }catch(Exception ee){
-            log.error(" create task error:"+ee.getMessage());
+            Jlog.error(" create task error:"+ee.getMessage());
         }
-        log.info("create task success:"+noticeTasksEntity.toString()+" task_id:"+task_id);
+        Jlog.info("create task success:"+noticeTasksEntity.toString()+" task_id:"+task_id);
 
         return task_id;
     }
@@ -148,7 +155,7 @@ public class SmsService {
         List<SmsReqEntity.SmsMsgEntity> items = new ArrayList<SmsReqEntity.SmsMsgEntity>();
         items.add(smsMsgEntity);
         smsReqEntity.setData(items);
-        log.info(smsReqEntity.toString());
+        Jlog.info(smsReqEntity.toString());
 
     }
 
@@ -165,10 +172,53 @@ public class SmsService {
             noticeTasksDao.updateNoticeTaskStatus(task_id, status, update_time);
         }catch(Exception ee){
             st = false;
-            log.error("update notice status error:"+ee.getMessage());
+            Jlog.error("update notice status error:"+ee.getMessage());
         }
         return st;
     }
+
+    /**
+     *
+     * 逻辑：扣取出message中的链接。加密，并替换。
+     * 并把这些数据存放到notice_tasks_track_recode表中
+     * 同时，这个加密的串，传出去，会放在result数据表中，作为映射
+     * @param task_id
+     * @param items
+     * @return
+     */
+    public List<NoticeTasksResultEntity> initSmsTrackRecode(Integer task_id,List<NoticeTasksResultEntity> items){
+        List<TrackRecodeEntity> trackRecodeEntities = Lists.newArrayList();
+        for(NoticeTasksResultEntity item: items){
+            String message = item.getMessage();
+            String costomer_url = Utils.getUrlFromMessage(message);
+            Map<String,String> trackUrlParam = Maps.newHashMap();
+            trackUrlParam.put("dest_url",costomer_url);
+            trackUrlParam.put("task_id",String.valueOf(task_id));
+            trackUrlParam.put("sc","sms");
+            trackUrlParam.put("ac","click");
+            Map<String,String> urlPair = urlService.makeTrackUrlPair(trackUrlParam);
+            Jlog.info("url pair:"+urlPair);
+            String track_url_org = Jurl.getCompleteTrackUrl(urlPair.get(costomer_url));
+            Jlog.info("track url org:"+track_url_org);
+            String short_track_url = urlService.makeShortUrl(track_url_org);
+            Jlog.info("short track url"+short_track_url);
+            String message_replace = Utils.replaceUrlFromMessage(message,short_track_url);
+            Jlog.debug("message replace"+message_replace);
+            TrackRecodeEntity track_entity = new TrackRecodeEntity();
+            track_entity.setTaskId(task_id);
+            track_entity.setTrackUrlSuffix(urlPair.get(costomer_url));
+            track_entity.setUrlOrg(costomer_url);
+            track_entity.setMessageOrg(message);
+            track_entity.setMessageReplace(message_replace);
+            trackRecodeEntities.add(track_entity);
+            item.setMessage(message_replace);
+            item.setTrackUrlSuffix(urlPair.get(costomer_url));
+        }
+        trackRecodeDao.addTrackRecodeInfoBatch(trackRecodeEntities);
+
+        return items;
+    }
+
 
     /**
      * 根据task的addresses创建各个phone的记录entity
@@ -186,7 +236,8 @@ public class SmsService {
             tasksResultEntity.setAddress(msg.getPhones());
             tasksResultEntity.setMsgid(msg.getMsgid());
             tasksResultEntity.setSubmitTime(submit_time);
-            tasksResultEntity.setStatus("new");
+            tasksResultEntity.setSendStatus("new");
+            tasksResultEntity.setMessage(msg.getContent());
             tasksResultEntities.add(tasksResultEntity);
         }
         return tasksResultEntities;
@@ -198,7 +249,7 @@ public class SmsService {
      * @param lists
      * @return
      */
-    public Boolean saveNoticeResultsBatch(List<NoticeTasksResultEntity> lists){
+    public Boolean saveNoticeResultsBatch(List<NoticeTasksResultEntity> lists) throws AppException {
         Boolean st = true;
         int lsize = lists.size();
         float fsize = 100f;
@@ -215,7 +266,35 @@ public class SmsService {
             }
         }catch (Exception ee){
             Jlog.error("save notice result error:"+ee.getMessage());
-            st = false;
+            throw new AppException("0","save notice result error:"+ee.getMessage());
+        }
+        return st;
+    }
+
+    /**
+     * 批量存到数据表notice_tasks_track_recode
+     * @param lists
+     * @return
+     * @throws AppException
+     */
+    public Boolean saveTrackRecodeBatch(List<TrackRecodeEntity> lists) throws AppException {
+        Boolean st = true;
+        int lsize = lists.size();
+        float fsize = 100f;
+        int isize = 100;
+        int count = (int) Math.ceil(lists.size()/fsize);
+        try {
+            for (int i = 0; i < count; i++) {
+                int end = (i + 1) * isize;
+                if (end > lsize) {
+                    end = lsize;
+                }
+                List<TrackRecodeEntity> patch = lists.subList(i * isize, end);
+                trackRecodeDao.addTrackRecodeInfoBatch(patch);
+            }
+        }catch (Exception ee){
+            Jlog.error("save notice result error:"+ee.getMessage());
+            throw new AppException("0","save notice result error:"+ee.getMessage());
         }
         return st;
     }
