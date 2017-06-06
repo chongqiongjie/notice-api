@@ -3,4 +3,4 @@
 .idea/
 notice-api.iml
 target/
-webapp/META-INF/MANIFEST.MF
+src/main/webapp/META-INF/MANIFEST.MF
