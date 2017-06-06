@@ -4,3 +4,4 @@
 notice-api.iml
 target/
 src/main/webapp/META-INF/MANIFEST.MF
+catalina.home_IS_UNDEFINED/
