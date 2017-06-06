@@ -18,6 +18,7 @@ import java.util.Map;
  * 包括：生成跟踪URL
  * 解析加密URL。
  */
+@SuppressWarnings("ALL")
 @Service("urlService")
 public class UrlService {
     private long url_time = 864000; //十天

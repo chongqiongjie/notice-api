@@ -10,6 +10,7 @@ import javax.annotation.Resource;
 /**
  * Created by fivebit on 2017/6/5.
  */
+@SuppressWarnings("ALL")
 @Service("noticeTaskService")
 public class NoticeTaskService {
     @Resource

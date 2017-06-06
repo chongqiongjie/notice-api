@@ -24,6 +24,7 @@ import java.util.*;
 /**
  * Created by fivebit on 2017/5/19.
  */
+@SuppressWarnings("ALL")
 @Service("smsService")
 public class SmsService {
 
