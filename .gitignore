@@ -2,3 +2,5 @@
 .gitignore
 .idea/
 notice-api.iml
+target/
+webapp/META-INF/MANIFEST.MF
