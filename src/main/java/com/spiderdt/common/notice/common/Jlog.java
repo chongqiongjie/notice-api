@@ -34,7 +34,7 @@ public class Jlog {
 		if( is_string == false){
 			msg = msg.toString();
 		}
-		msg = linenum+"-[uuid:"+requestid+"] "+ msg.toString();
+		msg = linenum+" "+requestid+" "+ msg.toString();
 		//msg = ""+linenum+" "+ msg.toString();
 		switch(type){
 		case 0:
