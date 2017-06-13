@@ -1,6 +1,7 @@
 package com.spiderdt.common.notice.common;
 
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -204,6 +205,21 @@ public class Utils {
     }
 
     /**
+     * 获取所有的url并返回
+     * @param message
+     * @return
+     */
+    public static List<String> getUrlsFromMessage(String message){
+        Pattern pb = Pattern.compile("(?<!\\d)(?:(?:[\\w[.-://]]*\\.[com|cn|net|tv|gov|org|biz|cc|uk|jp|edu]+[^\\s|^\\u4e00-\\u9fa5]*))");
+        Matcher mb = pb.matcher(message);
+        List<String> urls = Lists.newArrayList();
+        while(mb.find()) {
+            urls.add(mb.group());
+        }
+        return urls;
+    }
+
+    /**
      * 对文本中的第一个URL，使用新的URL进行替换
      * att.如果有多个URL，会出现一些不可预知的问题
      * @param message
@@ -220,7 +236,20 @@ public class Utils {
         }
         return re_message;
     }
+    public static String replaceUrlFromMessage(String message,String old_url,String new_url){
+        Pattern pb = Pattern.compile(old_url);
+        String re_message = message;
+        Matcher mb = pb.matcher(message);
+        if (mb.find()) {
+            Jlog.info("replace url:" + mb.group()+" new url:"+new_url);
+            re_message = mb.replaceAll(new_url);
+        }
+        return re_message;
+    }
 
+    public static String getUUID(){
+        return UUID.randomUUID().toString().replace("-", "");
+    }
 
 
 }

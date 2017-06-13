@@ -1,5 +1,6 @@
 package com.spiderdt.common.notice.entity;
 
+import com.spiderdt.common.notice.common.AppConstants;
 import com.spiderdt.common.notice.common.Jdate;
 import com.spiderdt.common.notice.resource.interfactBean.TaskInput;
 
@@ -16,19 +17,26 @@ public class NoticeTasksEntity implements Serializable {
     private String taskType ;
     private String clientId ;
     private String userId ;
+    private String jobId;
     private String addresses ;
+    private Integer templateId;
+    private String attachments;
+    private String subject;
     private String message ;
     private String status ;
     private String createTime ;
     private String updateTime ;
     public void initByTaskInput(TaskInput input){
         this.parentTaskId = 0;
-        this.taskType = input.getTaskType();
-        this.clientId = input.getClientId();
-        this.userId = input.getUserId();
-        this.addresses = input.getAddresses();
+        this.taskType = input.getTask_type();
+        this.clientId = input.getClient_id();
+        this.userId = input.getUser_id();
+        this.jobId = input.getJob_id();
+        this.templateId = input.getTemplate_id();
+        this.attachments = input.getAttachments();
+        this.subject = input.getSubject();
         this.message = input.getMessage();
-        this.status = "new";
+        this.status = AppConstants.TASK_STATUS_NEW;
         this.createTime = Jdate.getNowStrTime();
         this.updateTime = Jdate.getNowStrTime();
     }
@@ -51,6 +59,14 @@ public class NoticeTasksEntity implements Serializable {
 
     public void setParentTaskId(Integer parentTaskId) {
         this.parentTaskId = parentTaskId;
+    }
+
+    public String getJobId() {
+        return jobId;
+    }
+
+    public void setJobId(String jobId) {
+        this.jobId = jobId;
     }
 
     public String getTaskType() {
@@ -83,6 +99,30 @@ public class NoticeTasksEntity implements Serializable {
 
     public void setCreateTime(String createTime) {
         this.createTime = createTime;
+    }
+
+    public Integer getTemplateId() {
+        return templateId;
+    }
+
+    public void setTemplateId(Integer templateId) {
+        this.templateId = templateId;
+    }
+
+    public String getAttachments() {
+        return attachments;
+    }
+
+    public void setAttachments(String attachments) {
+        this.attachments = attachments;
+    }
+
+    public String getSubject() {
+        return subject;
+    }
+
+    public void setSubject(String subject) {
+        this.subject = subject;
     }
 
     public String getUpdateTime() {

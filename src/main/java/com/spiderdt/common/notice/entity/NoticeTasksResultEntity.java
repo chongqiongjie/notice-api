@@ -8,36 +8,33 @@ import java.io.Serializable;
 public class NoticeTasksResultEntity implements Serializable {
 
     private static final long serialVersionUID = -8039686696076337053L;
-    private Integer rid;
+    private String riid;
     private Integer taskId ;
-    private String msgid ;
-    private String trackUrlSuffix;
     private String address ;
     private String message ;
+    private String subject;
     private String sendStatus ;
     private String detailInfo ;
-    private String isOpen ;
-    private String isClick;
-    private String openTime;
-    private String clickTime;
     private String submitTime;
     private String sendTime;
     private String backTime;
+    // other value
+    private String taskType;
 
-    public Integer getRid() {
-        return rid;
+    public String getTaskType() {
+        return taskType;
     }
 
-    public void setRid(Integer rid) {
-        this.rid = rid;
+    public void setTaskType(String taskType) {
+        this.taskType = taskType;
     }
 
-    public String getTrackUrlSuffix() {
-        return trackUrlSuffix;
+    public String getRiid() {
+        return riid;
     }
 
-    public void setTrackUrlSuffix(String trackUrlSuffix) {
-        this.trackUrlSuffix = trackUrlSuffix;
+    public void setRiid(String riid) {
+        this.riid = riid;
     }
 
     public String getMessage() {
@@ -56,36 +53,12 @@ public class NoticeTasksResultEntity implements Serializable {
         this.sendStatus = sendStatus;
     }
 
-    public String getIsOpen() {
-        return isOpen;
+    public String getSubject() {
+        return subject;
     }
 
-    public void setIsOpen(String isOpen) {
-        this.isOpen = isOpen;
-    }
-
-    public String getIsClick() {
-        return isClick;
-    }
-
-    public void setIsClick(String isClick) {
-        this.isClick = isClick;
-    }
-
-    public String getOpenTime() {
-        return openTime;
-    }
-
-    public void setOpenTime(String openTime) {
-        this.openTime = openTime;
-    }
-
-    public String getClickTime() {
-        return clickTime;
-    }
-
-    public void setClickTime(String clickTime) {
-        this.clickTime = clickTime;
+    public void setSubject(String subject) {
+        this.subject = subject;
     }
 
     public static long getSerialVersionUID() {
@@ -98,14 +71,6 @@ public class NoticeTasksResultEntity implements Serializable {
 
     public void setTaskId(Integer taskId) {
         this.taskId = taskId;
-    }
-
-    public String getMsgid() {
-        return msgid;
-    }
-
-    public void setMsgid(String msgid) {
-        this.msgid = msgid;
     }
 
     public String getAddress() {
@@ -131,21 +96,17 @@ public class NoticeTasksResultEntity implements Serializable {
     @Override
     public String toString() {
         return "NoticeTasksResultEntity{" +
-                "rid=" + rid +
+                "riid='" + riid + '\'' +
                 ", taskId=" + taskId +
-                ", msgid='" + msgid + '\'' +
-                ", trackUrlSuffix='" + trackUrlSuffix + '\'' +
                 ", address='" + address + '\'' +
                 ", message='" + message + '\'' +
+                ", subject='" + subject + '\'' +
                 ", sendStatus='" + sendStatus + '\'' +
                 ", detailInfo='" + detailInfo + '\'' +
-                ", isOpen='" + isOpen + '\'' +
-                ", isClick='" + isClick + '\'' +
-                ", openTime='" + openTime + '\'' +
-                ", clickTime='" + clickTime + '\'' +
                 ", submitTime='" + submitTime + '\'' +
                 ", sendTime='" + sendTime + '\'' +
                 ", backTime='" + backTime + '\'' +
+                ", taskType='" + taskType + '\'' +
                 '}';
     }
 

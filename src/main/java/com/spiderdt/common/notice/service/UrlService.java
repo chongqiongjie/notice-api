@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Maps;
 import com.spiderdt.common.notice.common.*;
 import com.spiderdt.common.notice.dao.NoticeTasksDao;
+import com.spiderdt.common.notice.dao.TasksResultDao;
 import com.spiderdt.common.notice.dao.TrackRecodeDao;
 import com.spiderdt.common.notice.entity.TrackRecodeEntity;
 import org.springframework.stereotype.Service;
@@ -27,7 +28,11 @@ public class UrlService {
     @Resource
     private NoticeTasksDao noticeTasksDao;
     @Resource
+    private TasksResultDao tasksResultDao;
+    @Resource
     private BitlyService bitlyService;
+    @Resource
+    private Sredis sredis;
     /**
      * 批量制作track url
      * @param params
@@ -82,7 +87,7 @@ public class UrlService {
         param.put("org_url",org_url);
         JSONObject track_json_param = Utils.map2Json(param);
         try {
-            JredisClient.addString(org_url_redis_key, org_json_param.toJSONString(), url_time);
+            sredis.addString(org_url_redis_key, org_json_param.toJSONString(), url_time);
             JredisClient.addString(track_url_redis_key, track_json_param.toJSONString(), url_time);
         }catch (Exception ee){
             Jlog.error("save track pair url to redis error"+ee.getMessage());
@@ -137,7 +142,7 @@ public class UrlService {
         String sc = track_info.get("sc");
         String ac = track_info.get("ac");
         trackRecodeDao.updateTrackRecodeStatus(track_url_suffix,1);
-        noticeTasksDao.updateNoticeTaskTrackInfo(track_url_suffix,ac,"1",Jdate.getNowStrTime());
+        tasksResultDao.updateNoticeTaskTrackInfo(track_url_suffix,ac,"1",Jdate.getNowStrTime());
         return true;
     }
 
