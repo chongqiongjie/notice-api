@@ -7,7 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * @author ranran
@@ -63,6 +65,20 @@ public class EmailServiceTest extends TestCase {
         imgPath.put(1, "D:/图片/loveyue-master/月儿.png");
         imgPath.put(2, "D:\\图片\\Camera Roll\\14803106.jpg");
         emailService.sendPhoto("ran.bo@spiderdt.com", "TextTest", content, imgPosition, imgPath);
+    }
+
+    @Test
+   public void sendAttachments(){
+        String content = "<html><head></head><body><h1>hello!!spring image html mail</h1><h2>大家好，这是Spring的邮件发送模块</h2>";
+        List<String> list = new ArrayList<>();
+        list.add("/Users/qiong/Desktop/category.csv");
+        list.add("/Users/qiong/Desktop/test");
+        emailService.sendAttachments("chong.qiongjie@spiderdt.com","TextTest",content,list);
+    }
+
+    @Test
+    public void download(){
+       emailService.download("http://www.qqleju.com/uploads/allimg/130618/18-110930_9.jpg", "chong");
     }
 
 
