@@ -9,6 +9,7 @@ import com.spiderdt.common.notice.service.NoticeTaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -38,8 +39,8 @@ public class TaskResource {
     //@Path("")
     @POST
     @Consumes({ MediaType.APPLICATION_JSON })
-    public Response createTask(TaskInput task_param) throws AppException {
-     //   String authorization = request.getHeader("Authorization");
+    public Response createTask(TaskInput task_param, HttpServletRequest request) throws AppException {
+        String authorization = request.getHeader("Authorization");
         //get user info
         NoticeTasksEntity noticeTasksEntity = new NoticeTasksEntity();
         noticeTasksEntity.initByTaskInput(task_param);

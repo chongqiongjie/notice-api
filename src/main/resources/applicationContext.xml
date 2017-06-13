@@ -34,5 +34,12 @@
     <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PreferencesPlaceholderConfigurer">
         <property name="properties" ref="appProperties" />
     </bean>
+    <bean id="slog" class="com.spiderdt.common.notice.common.Slog" > </bean>
+    <bean id="sredis" class="com.spiderdt.common.notice.common.Sredis" >
+        <constructor-arg name="host" value ="${redis.host}"/>
+        <constructor-arg name="port" value ="${redis.port}"/>
+        <constructor-arg name="timeout" value ="${redis.timeout}"/>
+        <constructor-arg name="prefix" value ="${redis.prefix}"/>
+    </bean>
   
 </beans> 
