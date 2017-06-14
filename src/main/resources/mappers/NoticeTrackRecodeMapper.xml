@@ -29,7 +29,7 @@
     </select>
     <update id="updateTrackRecodeStatus">
         update notice.notice_tasks_track_recode
-        set status=#{status}
+        set is_click=#{status}
         where track_url_suffix =#{encrypt_url};
     </update>
 
