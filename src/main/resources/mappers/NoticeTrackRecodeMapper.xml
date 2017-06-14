@@ -16,7 +16,7 @@
     </resultMap>
 
     <insert id="addTrackRecodeInfoBatch" parameterType="java.util.List">
-        insert into notice_tasks_track_recode
+        insert into notice.notice_tasks_track_recode
         (track_url_suffix,track_type,url_org,task_id,riid,message_replace,message_org,params)
         values
         <foreach collection="list" item="item" index="index" separator=",">
@@ -25,10 +25,10 @@
         </foreach>
     </insert>
     <select id="getTrackRecodeInfoByEncrypt" resultMap="TrackRecodeResultMap">
-        select * from notice_tasks_track_recode where track_url_suffix=#{encrypt_url};
+        select * from notice.notice_tasks_track_recode where track_url_suffix=#{encrypt_url};
     </select>
     <update id="updateTrackRecodeStatus">
-        update notice_tasks_track_recode
+        update notice.notice_tasks_track_recode
         set status=#{status}
         where track_url_suffix =#{encrypt_url};
     </update>

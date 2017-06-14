@@ -17,12 +17,12 @@
     </resultMap>
     <select id="getNewNoticeTaskResultsBatch" resultMap="TasksResultMap" parameterType="String">
         select result.riid,result.task_id,result.address,result.message,result.subject,tasks.task_type
-        from notice_tasks_result_info  as result
-        join notice_tasks as tasks on (tasks.task_id= result.task_id)
+        from notice.notice_tasks_result_info  as result
+        join notice.notice_tasks as tasks on (tasks.task_id= result.task_id)
         where result.send_status =#{status} limit 200;
     </select>
     <insert id="createNoticeTaskResultBatch" parameterType="java.util.List">
-        insert into notice_tasks_result_info
+        insert into notice.notice_tasks_result_info
         (riid,task_id,address,message,subject,send_status,submit_time)
         values
         <foreach collection="list" item="item" index="index" separator=",">
@@ -31,7 +31,7 @@
         </foreach>
     </insert>
     <update id="updateNoticeTaskResultStatus">
-        update notice_tasks_result_info
+        update notice.notice_tasks_result_info
         set send_status=#{status},
         detail_info=#{detail_info},
         submit_time=#{submit_time}
@@ -39,7 +39,7 @@
     </update>
 
     <update id="updateNoticeTaskBackInfoStatus">
-        update notice_tasks_result_info
+        update notice.notice_tasks_result_info
         set send_status=#{status},
         detail_info=#{detail_info},
         send_time = #{send_time},
@@ -47,7 +47,7 @@
         where riid=#{msgid};
     </update>
     <update id="updateNoticeTaskTrackInfo">
-        update notice_tasks_result_info
+        update notice.notice_tasks_result_info
         <choose>
             <when test="ac='show'">
                 set is_open=#{status},open_time=#{atime}
