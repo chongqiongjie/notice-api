@@ -2,12 +2,14 @@ package com.spiderdt.common.notice.dao;
 
 import com.spiderdt.common.notice.entity.NoticeTasksResultEntity;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 /**
  * Created by fivebit on 2017/6/13.
  */
+@Repository
 public interface TasksResultDao {
     public void createNoticeTaskResultBatch(List<NoticeTasksResultEntity> noticeTasksEntitys);
 

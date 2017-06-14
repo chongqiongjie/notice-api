@@ -2,12 +2,14 @@ package com.spiderdt.common.notice.dao;
 
 import com.spiderdt.common.notice.entity.NoticeTasksEntity;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 /**
  * Created by fivebit on 2017/5/19.
  */
+@Repository
 public interface NoticeTasksDao {
     /**
      * 获取一个新创建的task
