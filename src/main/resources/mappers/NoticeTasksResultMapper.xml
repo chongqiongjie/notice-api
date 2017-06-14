@@ -35,7 +35,7 @@
         set send_status=#{status},
         detail_info=#{detail_info},
         submit_time=#{submit_time}
-        where msgid=#{msgid};
+        where riid=#{msgid};
     </update>
 
     <update id="updateNoticeTaskBackInfoStatus">

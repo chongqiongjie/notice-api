@@ -41,7 +41,7 @@ public class NoticeTaskService {
     private EmailService emailService;
     @Autowired
     Slog slog;
-    protected  String json_address_key = "phone";
+    protected  String json_address_key = "address"; //phone/email
     protected  String url_ac = "click";
     protected  String track_type = "click";
     protected  String image_track_type = "image";
@@ -120,7 +120,7 @@ public class NoticeTaskService {
     public String getAddressesFromJobId(String job_id){
 
 
-        String ret = "[{\"name\":\"qiong\",\"phone\":\"18217168545\"}]";
+        String ret = "[{\"name\":\"qiong\",\"address\":\"18217168545\"}]";
         return ret;
 
     }
