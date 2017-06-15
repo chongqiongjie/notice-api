@@ -31,7 +31,30 @@ public class EmailServiceTest extends TestCase {
         System.out.println("------------------");
         System.out.println(emailService);
         System.out.println("******************");
-//        emailService.sendHtml("ran.bo@spiderdt.com", "htmlTest","<html><head></head><body><h1>hello! Html test</h1></body></html>");
+        String html = "<!DOCTYPE html>\n" +
+                "<html lang=\"en\">\n" +
+                "<head>\n" +
+                "<meta charset=\"UTF-8\">\n" +
+                "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n" +
+                "<meta http-equiv=\"X-UA-Compatible\" content=\"ie=edge\">\n" +
+                "<title>Document</title>\n" +
+                "</head>\n" +
+                "<body style=\"color: #666\">\n" +
+                "<p><strong>您好:</strong></p >\n" +
+                "<img src=\"%s\" width=\"0\" height=\"0\">\n"+
+                "<p>如果您没有请求更改密码，请不要点击！</p >\n" +
+                "</body>\n" +
+                "<style>\n" +
+                "a:hover {\n" +
+                "color: #5b9ed8 !important;\n" +
+                "text-decoration: underline !important;\n" +
+                "}\n" +
+                "</style>\n" +
+                "</html>";
+        html = String.format(html, "http://localhost:8080/track/open123");
+//        html = String.format(html, "http://localhost:8080/track/123456");
+        System.out.println(html);
+//        emailService.sendHtml("ran.bo@spiderdt.com", "htmlTest", html);
 
     }
 
