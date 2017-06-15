@@ -1,6 +1,7 @@
 package com.spiderdt.common.notice.resource;
 
 import com.spiderdt.common.notice.common.Jlog;
+import com.spiderdt.common.notice.common.Utils;
 import com.spiderdt.common.notice.service.UrlService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -11,6 +12,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Created by fivebit on 2017/6/1.
@@ -35,8 +37,15 @@ public class TrackResource {
         Jlog.info("track org info:"+trackUrlOrgInfo);
         urlService.updateTaskResultByTrackInfo(trackUrlOrgInfo);
         Jlog.info("do track url end:"+encrypt_url);
-        Jlog.info("org_url:" + trackUrlOrgInfo.get("org_url"));
-        return Response.seeOther(URI.create(trackUrlOrgInfo.get("org_url"))).build();
-
+        String orgUrl =  trackUrlOrgInfo.get("org_url");
+        if(Objects.equals(orgUrl, "")) {
+            // click url
+            return Response.status(Response.Status.CREATED)// 201
+                    .entity(Utils.getRespons()).build();
+        }else {
+            // open 图片 src
+            Jlog.info("org_url:" + orgUrl);
+            return Response.seeOther(URI.create(trackUrlOrgInfo.get("org_url"))).build();
+        }
     }
 }
