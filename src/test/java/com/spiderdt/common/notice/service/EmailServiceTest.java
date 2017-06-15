@@ -31,6 +31,7 @@ public class EmailServiceTest extends TestCase {
         System.out.println("------------------");
         System.out.println(emailService);
         System.out.println("******************");
+        //        style="display: none" width="0" height="0" 图片隐藏
         String html = "<!DOCTYPE html>\n" +
                 "<html lang=\"en\">\n" +
                 "<head>\n" +
@@ -41,8 +42,7 @@ public class EmailServiceTest extends TestCase {
                 "</head>\n" +
                 "<body style=\"color: #666\">\n" +
                 "<p><strong>您好:</strong></p >\n" +
-                "<img src=\"%s\" width=\"0\" height=\"0\">\n"+
-                "<p>如果您没有请求更改密码，请不要点击！</p >\n" +
+                "<img src=\"%s\" width=\"0\" height=\"0\" style=\"display: none\">\n"+
                 "</body>\n" +
                 "<style>\n" +
                 "a:hover {\n" +
