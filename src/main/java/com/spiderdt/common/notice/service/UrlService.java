@@ -121,10 +121,11 @@ public class UrlService {
         }
         if(org_url_and_params == null){
             TrackRecodeEntity trackRecodeEntity = getTrackRecodeByEncrypt(encrypt_code);
+            Jlog.debug("getTrackUrlOrgInfoByEncrypt trackRecodeEntity:" + trackRecodeEntity);
             org_url_and_params = trackRecodeEntity.getMapParams();
             org_url_and_params.put("org_url",trackRecodeEntity.getUrlOrg());
         }
-        org_url_and_params.put("url_encode",encrypt_code);
+        org_url_and_params.put("track_url_suffix",encrypt_code);
         return org_url_and_params;
     }
 
@@ -133,16 +134,15 @@ public class UrlService {
         if(trackRecodeEntity != null){
             trackRecodeEntity.setMapParams(Utils.json2map(JSONObject.parseObject(trackRecodeEntity.getParams())));
         }
+        Jlog.info("getTrackRecodeByEncrypt: trackRecodeEntity"+ trackRecodeEntity);
         return trackRecodeEntity;
 
     }
 
     public Boolean updateTaskResultByTrackInfo(Map<String,String> track_info){
         String track_url_suffix = track_info.get("track_url_suffix");
-        String sc = track_info.get("sc");
-        String ac = track_info.get("ac");
+
         trackRecodeDao.updateTrackRecodeStatus(track_url_suffix,1);
-        tasksResultDao.updateNoticeTaskTrackInfo(track_url_suffix,ac,"1",Jdate.getNowStrTime());
         return true;
     }
 
