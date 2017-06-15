@@ -19,7 +19,7 @@ public class TrackRecodeEntity implements Serializable {
     private String params;
     private Map<String,String> mapParams;
     private Integer isClick;
-    private String clieckTime;
+    private String clickTime;
 
     @Override
     public String toString() {
@@ -34,7 +34,7 @@ public class TrackRecodeEntity implements Serializable {
                 ", params='" + params + '\'' +
                 ", mapParams=" + mapParams +
                 ", isClick=" + isClick +
-                ", clieckTime='" + clieckTime + '\'' +
+                ", clickTime='" + clickTime + '\'' +
                 '}';
     }
 
@@ -118,12 +118,12 @@ public class TrackRecodeEntity implements Serializable {
         this.isClick = isClick;
     }
 
-    public String getClieckTime() {
-        return clieckTime;
+    public String getClickTime() {
+        return clickTime;
     }
 
-    public void setClieckTime(String clieckTime) {
-        this.clieckTime = clieckTime;
+    public void setClickTime(String clickTime) {
+        this.clickTime = clickTime;
     }
 
     public void setMapParams(Map<String, String> mapParams) {
