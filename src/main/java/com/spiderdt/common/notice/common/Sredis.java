@@ -245,7 +245,7 @@ public class Sredis {
 		Jedis redisClient = null;
 		try {
 			redisClient = getJedis();
-			result = redisClient.del(key);
+			result = redisClient.del(prefix+"::"+key);
 		} catch (Exception e) { // 销毁对象
 			log.error("delete data error:"+e.getMessage());
 		} finally { // 还原到连接池

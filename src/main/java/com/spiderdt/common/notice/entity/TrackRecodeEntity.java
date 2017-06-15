@@ -9,26 +9,32 @@ import java.util.Map;
 public class TrackRecodeEntity implements Serializable {
 
     private static final long serialVersionUID = -8039686696076337053L;
-    private Integer taskId;
     private String trackUrlSuffix;
+    private String trackType;
     private String urlOrg;
+    private Integer taskId;
+    private String riid;
     private String messageReplace;
     private String messageOrg;
     private String params;
     private Map<String,String> mapParams;
-    private Integer status;
+    private Integer isClick;
+    private String clickTime;
 
     @Override
     public String toString() {
         return "TrackRecodeEntity{" +
-                "taskId=" + taskId +
-                ", trackUrlSuffix='" + trackUrlSuffix + '\'' +
+                "trackUrlSuffix='" + trackUrlSuffix + '\'' +
+                ", trackType='" + trackType + '\'' +
                 ", urlOrg='" + urlOrg + '\'' +
+                ", taskId=" + taskId +
+                ", riid='" + riid + '\'' +
                 ", messageReplace='" + messageReplace + '\'' +
                 ", messageOrg='" + messageOrg + '\'' +
                 ", params='" + params + '\'' +
                 ", mapParams=" + mapParams +
-                ", status=" + status +
+                ", isClick=" + isClick +
+                ", clickTime='" + clickTime + '\'' +
                 '}';
     }
 
@@ -64,14 +70,6 @@ public class TrackRecodeEntity implements Serializable {
         this.messageOrg = messageOrg;
     }
 
-    public Integer getStatus() {
-        return status;
-    }
-
-    public void setStatus(Integer status) {
-        this.status = status;
-    }
-
     public static long getSerialVersionUID() {
         return serialVersionUID;
     }
@@ -94,6 +92,38 @@ public class TrackRecodeEntity implements Serializable {
 
     public Map<String, String> getMapParams() {
         return mapParams;
+    }
+
+    public String getTrackType() {
+        return trackType;
+    }
+
+    public void setTrackType(String trackType) {
+        this.trackType = trackType;
+    }
+
+    public String getRiid() {
+        return riid;
+    }
+
+    public void setRiid(String riid) {
+        this.riid = riid;
+    }
+
+    public Integer getIsClick() {
+        return isClick;
+    }
+
+    public void setIsClick(Integer isClick) {
+        this.isClick = isClick;
+    }
+
+    public String getClickTime() {
+        return clickTime;
+    }
+
+    public void setClickTime(String clickTime) {
+        this.clickTime = clickTime;
     }
 
     public void setMapParams(Map<String, String> mapParams) {

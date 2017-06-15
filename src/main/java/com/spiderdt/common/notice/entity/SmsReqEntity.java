@@ -9,7 +9,7 @@ import java.util.List;
 public class SmsReqEntity implements Serializable {
 
     private static final long serialVersionUID = -8039686696076337053L;
-    private String accout;
+    private String account;
     private String password;
     private List<SmsMsgEntity> data ;
 
@@ -17,12 +17,12 @@ public class SmsReqEntity implements Serializable {
         return serialVersionUID;
     }
 
-    public String getAccout() {
-        return accout;
+    public String getAccount() {
+        return account;
     }
 
-    public void setAccout(String accout) {
-        this.accout = accout;
+    public void setAccount(String account) {
+        this.account = account;
     }
 
     public String getPassword() {
@@ -44,7 +44,7 @@ public class SmsReqEntity implements Serializable {
     @Override
     public String toString() {
         return "SmsReqEntity{" +
-                "accout='" + accout + '\'' +
+                "account='" + account + '\'' +
                 ", password='" + password + '\'' +
                 ", data=" + data +
                 '}';

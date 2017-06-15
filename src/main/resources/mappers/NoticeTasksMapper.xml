@@ -16,23 +16,27 @@
 	</resultMap>
 
 	<select id="getNewNoticeTask" resultMap="TaskResultMap">
-		select * from notice_tasks where task_type= #{task_type} and status ='new' limit 1;
+		select * from notice.notice_tasks where task_type= #{task_type} and status ='new' limit 1;
 	</select>
 	<select id="getNewNoticeTasks" resultMap="TaskResultMap">
-		select * from notice_tasks where status ='new' and task_type=#{task_type};
+		select * from notice.notice_tasks where status ='new' and task_type=#{task_type};
 	</select>
 	<select id="getNoticeTasksByStatus" resultMap="TaskResultMap" parameterType="String">
-		select * from notice_tasks where status =#{status};
+		select * from notice.notice_tasks where status =#{status};
 	</select>
 	<insert id="createNoticeTask" parameterType="com.spiderdt.common.notice.entity.NoticeTasksEntity" useGeneratedKeys="true" keyProperty="task_id">
-		insert into notice_tasks
-		(parent_task_id,task_type,client_id,user_id,addresses,message,status,create_time,update_time)
+		<selectKey resultType="java.lang.Integer" keyProperty="taskId" order="AFTER">
+			SELECT currval('notice_tasks_task_id_seq')
+		</selectKey>
+
+		insert into notice.notice_tasks
+		(parent_task_id,task_type,client_id,user_id,job_id,template_id,addresses,message,subject,attachments,status,create_time,update_time)
 		values
-		(#{parentTaskId},#{taskType},#{clientId},#{userId},#{addresses}
-		,#{message},#{status}, #{createTime},#{updateTime});
+		(#{parentTaskId},#{taskType},#{clientId},#{userId},#{jobId},#{templateId},#{addresses}
+		,#{message},#{subject},#{attachments},#{status}, #{createTime},#{updateTime});
 	</insert>
     <update id="updateNoticeTaskStatus">
-		update notice_tasks
+		update notice.notice_tasks
 		set status=#{status},update_time=#{update_time}
 		where task_id =#{task_id};
 	</update>

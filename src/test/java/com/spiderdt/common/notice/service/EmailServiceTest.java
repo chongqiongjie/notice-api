@@ -31,18 +31,18 @@ public class EmailServiceTest extends TestCase {
         System.out.println("------------------");
         System.out.println(emailService);
         System.out.println("******************");
-        emailService.sendHtml("ran.bo@spiderdt.com", "htmlTest","<html><head></head><body><h1>hello! Html test</h1></body></html>");
+//        emailService.sendHtml("ran.bo@spiderdt.com", "htmlTest","<html><head></head><body><h1>hello! Html test</h1></body></html>");
 
     }
 
     @Test
     public void testSendText() throws Exception {
-        emailService.sendText("ran.bo@spiderdt.com", "TextTest","this is a test!");
+//        emailService.sendText("ran.bo@spiderdt.com", "TextTest","this is a test!");
     }
 
     @Test
     public void testSendAttachment() throws Exception {
-        emailService.sendAttachment("ran.bo@spiderdt.com", "TextTest","this is a test!", "D:\\图片\\loveyue-master\\第一个.zip");
+//        emailService.sendAttachment("ran.bo@spiderdt.com", "TextTest","this is a test!", "D:\\图片\\loveyue-master\\第一个.zip");
     }
 
     @Test
@@ -50,7 +50,7 @@ public class EmailServiceTest extends TestCase {
         // %s 用于 format 加入图片位置
         String content = "<html><head></head><body><h1>hello!!spring image html mail</h1><h2>大家好，这是Spring的邮件发送模块</h2>"
                 + "<img src=\"cid:%s\"/></body></html>";
-        emailService.sendPhoto("ran.bo@spiderdt.com", "TextTest",content, "imgId","D:/图片/loveyue-master/月儿.png");
+//        emailService.sendPhoto("ran.bo@spiderdt.com", "TextTest",content, "imgId","D:/图片/loveyue-master/月儿.png");
     }
 
     @Test
@@ -64,7 +64,7 @@ public class EmailServiceTest extends TestCase {
         imgPosition.put(2, "imgId2");
         imgPath.put(1, "D:/图片/loveyue-master/月儿.png");
         imgPath.put(2, "D:\\图片\\Camera Roll\\14803106.jpg");
-        emailService.sendPhoto("ran.bo@spiderdt.com", "TextTest", content, imgPosition, imgPath);
+//        emailService.sendPhoto("ran.bo@spiderdt.com", "TextTest", content, imgPosition, imgPath);
     }
 
     @Test
@@ -73,7 +73,7 @@ public class EmailServiceTest extends TestCase {
         List<String> list = new ArrayList<>();
         list.add("/Users/qiong/Desktop/category.csv");
         list.add("/Users/qiong/Desktop/test");
-        emailService.sendAttachments("chong.qiongjie@spiderdt.com","TextTest",content,list);
+//        emailService.sendAttachments("chong.qiongjie@spiderdt.com","TextTest",content,list);
     }
 
     @Test

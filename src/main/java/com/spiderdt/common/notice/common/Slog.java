@@ -2,9 +2,7 @@ package com.spiderdt.common.notice.common;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.UUID;
 
 public class Slog {
@@ -13,8 +11,9 @@ public class Slog {
 	public int linenum = 0;
 	public String classname = "";
 	public String requestid = "";
-	@Autowired
-	public HttpServletRequest request;
+	//@Autowired
+	//@Lazy
+	//public HttpServletRequest request;
 
     Slog(){
 	}
@@ -34,9 +33,9 @@ public class Slog {
 			msg = msg.toString();
 		}
 		try {
-			requestid = null == request.getHeader("X-Request-ID") ?
-					UUID.randomUUID().toString().replace("-", "").substring(0, 15)
-					: request.getHeader("X-Request-ID");
+			//requestid = null == request.getHeader("X-Request-ID") ?
+			//		UUID.randomUUID().toString().replace("-", "").substring(0, 15)
+			//		: request.getHeader("X-Request-ID");
 		}catch (Exception ee){
 			requestid = UUID.randomUUID().toString().replace("-", "").substring(0, 15);
 		}

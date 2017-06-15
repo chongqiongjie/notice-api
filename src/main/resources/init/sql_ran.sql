@@ -97,6 +97,8 @@ COMMENT ON COLUMN notice.notice_tasks_track_recode.params IS '一些属性，Jso
 COMMENT ON COLUMN notice.notice_tasks_track_recode.is_click IS '是否点击/查看,1/0';
 COMMENT ON COLUMN notice.notice_tasks_track_recode.click_time IS '点击/查看时间';
 
+INSERT INTO notice.notice_tasks_track_recode VALUES ('track_url_suffix_test', 'click', 'url_org_test', 3000, 'riid_test', 'message_replace_test', 'message_org', 'params', 0, '未查看');
+
 create table if not exists notice.notice_message_template (
 tid SERIAL primary key not null,
 temp_name text,

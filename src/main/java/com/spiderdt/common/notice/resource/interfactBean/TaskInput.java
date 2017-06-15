@@ -9,47 +9,49 @@ import java.io.Serializable;
 public class TaskInput implements Serializable {
 
     private static final long serialVersionUID = -8039686696076337054L;
-    private String taskType;
-    private String clientId;
-    private String userId;
-    private String addresses;
+    private String task_type;
+    private String client_id;
+    private String user_id;
+    private String job_id;
+    private Integer template_id;
     private String message;
-
-    public String getTaskType() {
-        return taskType;
-    }
-
-    public void setTaskType(String taskType) {
-        this.taskType = taskType;
-    }
-
-    public String getClientId() {
-        return clientId;
-    }
-
-    public void setClientId(String clientId) {
-        this.clientId = clientId;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
+    private String subject = "";
+    private String attachments = "";
 
     public static long getSerialVersionUID() {
         return serialVersionUID;
     }
 
-
-    public String getAddresses() {
-        return addresses;
+    public String getTask_type() {
+        return task_type;
     }
 
-    public void setAddresses(String addresses) {
-        this.addresses = addresses;
+    public void setTask_type(String task_type) {
+        this.task_type = task_type;
+    }
+
+    public String getClient_id() {
+        return client_id;
+    }
+
+    public void setClient_id(String client_id) {
+        this.client_id = client_id;
+    }
+
+    public String getUser_id() {
+        return user_id;
+    }
+
+    public void setUser_id(String user_id) {
+        this.user_id = user_id;
+    }
+
+    public String getJob_id() {
+        return job_id;
+    }
+
+    public void setJob_id(String job_id) {
+        this.job_id = job_id;
     }
 
     public String getMessage() {
@@ -60,14 +62,41 @@ public class TaskInput implements Serializable {
         this.message = message;
     }
 
+    public Integer getTemplate_id() {
+        return template_id;
+    }
+
+    public void setTemplate_id(Integer template_id) {
+        this.template_id = template_id;
+    }
+
+    public String getAttachments() {
+        return attachments;
+    }
+
+    public void setAttachments(String attachments) {
+        this.attachments = attachments;
+    }
+
+    public String getSubject() {
+        return subject;
+    }
+
+    public void setSubject(String subject) {
+        this.subject = subject;
+    }
+
     @Override
     public String toString() {
         return "TaskInput{" +
-                "taskType='" + taskType + '\'' +
-                ", clientId='" + clientId + '\'' +
-                ", userId='" + userId + '\'' +
-                ", addresses='" + addresses + '\'' +
+                "task_type='" + task_type + '\'' +
+                ", client_id='" + client_id + '\'' +
+                ", user_id='" + user_id + '\'' +
+                ", job_id='" + job_id + '\'' +
                 ", message='" + message + '\'' +
+                ", template_id='" + template_id + '\'' +
+                ", attachments='" + attachments + '\'' +
+                ", subject='" + subject + '\'' +
                 '}';
     }
 }

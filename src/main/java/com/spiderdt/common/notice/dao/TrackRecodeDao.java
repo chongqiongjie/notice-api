@@ -2,6 +2,7 @@ package com.spiderdt.common.notice.dao;
 
 import com.spiderdt.common.notice.entity.TrackRecodeEntity;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
@@ -9,6 +10,7 @@ import java.util.List;
  * Created by fivebit on 2017/6/3.
  * 对应notice_tasks_track_recode 这张表。
  */
+@Repository
 public interface TrackRecodeDao {
     /**
      * 根据加密url的key，查询数据库中的记录

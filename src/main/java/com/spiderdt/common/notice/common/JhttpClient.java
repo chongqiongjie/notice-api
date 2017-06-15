@@ -21,7 +21,7 @@ public class JhttpClient {
     private static Logger log = LoggerFactory.getLogger(JhttpClient.class);
 
     public static JSONObject httpPost(String url,JSONObject jsonParam){
-        return JhttpClient.httpPost(url, jsonParam, true);
+        return JhttpClient.httpPost(url, jsonParam, false);
     }
     public static JSONObject httpPost(String url,JSONObject params,Boolean noNeedResponse){
         DefaultHttpClient httpClient = new DefaultHttpClient();
@@ -35,11 +35,13 @@ public class JhttpClient {
                 method.setEntity(entity);
             }
             HttpResponse result = httpClient.execute(method);
+            Jlog.info("request:"+url+" and return:"+result.getStatusLine());
             url = URLDecoder.decode(url, "UTF-8");
             if (result.getStatusLine().getStatusCode() == 200) {
                 String str = "";
                 try {
-                    str = EntityUtils.toString(result.getEntity());
+                    str = EntityUtils.toString(result.getEntity(),"UTF-8");
+                    Jlog.info("request return entity :"+str);
                     if (noNeedResponse) {
                         return null;
                     }
@@ -51,6 +53,7 @@ public class JhttpClient {
         } catch (IOException e) {
             log.error("post request error:" + url, e);
         }
+        Jlog.debug("http post return:"+jsonResult.toJSONString());
         return jsonResult;
     }
     public static JSONObject httpGet(String url){

@@ -1,52 +1,53 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.spiderdt.common.notice.dao.NoticeTasksDao">
+<mapper namespace="com.spiderdt.common.notice.dao.TasksResultDao">
 
     <resultMap id="TasksResultMap" type="com.spiderdt.common.notice.entity.NoticeTasksResultEntity">
-        <result column="task_id" property="taskId" jdbcType="NUMERIC" />
-        <result column="msgid" property="msgid" jdbcType="VARCHAR" />
-        <result column="track_url_suffix" property="trackUrlSuffix" jdbcType="VARCHAR" />
+        <result column="riid" property="riid" jdbcType="NUMERIC" />
+        <result column="task_id" property="taskId" jdbcType="VARCHAR" />
         <result column="address" property="address" jdbcType="VARCHAR" />
         <result column="message" property="message" jdbcType="VARCHAR" />
-        <result column="addresses" property="addresses" jdbcType="VARCHAR" />
+        <result column="subject" property="subject" jdbcType="VARCHAR" />
         <result column="send_status" property="sendStatus" jdbcType="VARCHAR" />
         <result column="detail_info" property="detailInfo" jdbcType="VARCHAR" />
-        <result column="is_open" property="isOpen" jdbcType="VARCHAR" />
-        <result column="is_click" property="isClick" jdbcType="VARCHAR" />
-        <result column="open_time" property="openTime" jdbcType="VARCHAR" />
-        <result column="click_time" property="clickTime" jdbcType="VARCHAR" />
         <result column="submit_time" property="submitTime" jdbcType="VARCHAR" />
         <result column="send_time" property="sendTime" jdbcType="VARCHAR" />
         <result column="back_time" property="backTime" jdbcType="VARCHAR" />
+        <result column="task_type" property="taskType" jdbcType="VARCHAR" />
     </resultMap>
-
+    <select id="getNewNoticeTaskResultsBatch" resultMap="TasksResultMap" parameterType="String">
+        select result.riid,result.task_id,result.address,result.message,result.subject,tasks.task_type
+        from notice.notice_tasks_result_info  as result
+        join notice.notice_tasks as tasks on (tasks.task_id= result.task_id)
+        where result.send_status =#{status} limit 200;
+    </select>
     <insert id="createNoticeTaskResultBatch" parameterType="java.util.List">
-        insert into notice_tasks_result_info
-        (task_id,msgid,track_url_suffix,address,message,send_status,submit_time)
+        insert into notice.notice_tasks_result_info
+        (riid,task_id,address,message,subject,send_status,submit_time)
         values
         <foreach collection="list" item="item" index="index" separator=",">
-                (#{item.taskId},#{item.msgid},#{item.trackUrlSuffix},
-            #{item.address},#{item.message},#{item.sendStatus},#{item.submitTime})
+                (#{item.riid},#{item.taskId},
+            #{item.address},#{item.message},#{item.subject},#{item.sendStatus},#{item.submitTime})
         </foreach>
     </insert>
     <update id="updateNoticeTaskResultStatus">
-        update notice_tasks_result_info
-        set status=#{status},
+        update notice.notice_tasks_result_info
+        set send_status=#{status},
         detail_info=#{detail_info},
-        send_time=#{send_time}
         submit_time=#{submit_time}
-        where task_id =#{task_id} and msgid=#{msgid};
+        where riid=#{msgid};
     </update>
 
     <update id="updateNoticeTaskBackInfoStatus">
-        update notice_tasks_result_info
-        set status=#{status},
+        update notice.notice_tasks_result_info
+        set send_status=#{status},
         detail_info=#{detail_info},
+        send_time = #{send_time},
         back_time=#{back_time}
-        where msgid=#{msgid};
+        where riid=#{msgid};
     </update>
     <update id="updateNoticeTaskTrackInfo">
-        update notice_tasks_result_info
+        update notice.notice_tasks_result_info
         <choose>
             <when test="ac='show'">
                 set is_open=#{status},open_time=#{atime}

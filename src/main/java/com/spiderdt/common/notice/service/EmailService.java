@@ -1,6 +1,7 @@
 package com.spiderdt.common.notice.service;
 
 import com.spiderdt.common.notice.common.Jlog;
+import com.spiderdt.common.notice.entity.NoticeTasksResultEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
@@ -244,6 +245,16 @@ public class EmailService {
 
         Jlog.info("------------ sendPhotoEmail");
         sender.send(mimeMsg);
+    }
+
+    /**
+     * 批量发送邮件
+     * @param items
+     * @return
+     */
+    public Boolean sendEmailBatch(List<NoticeTasksResultEntity> items){
+
+        return true;
     }
 
 }
