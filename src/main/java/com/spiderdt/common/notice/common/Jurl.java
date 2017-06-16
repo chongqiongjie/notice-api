@@ -17,6 +17,7 @@ import java.util.Map;
 public class Jurl {
     //跟踪URL服务地址
     public static String track_host = "https://api.spiderdt.com/notice/track/";
+//    public static String track_host = "http://127.0.0.1:8080/track/";
 
     public static String makeShortUrl(String url){
 
