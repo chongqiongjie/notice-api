@@ -26,7 +26,7 @@
 	</select>
 	<insert id="createNoticeTask" parameterType="com.spiderdt.common.notice.entity.NoticeTasksEntity" useGeneratedKeys="true" keyProperty="task_id">
 		<selectKey resultType="java.lang.Integer" keyProperty="taskId" order="AFTER">
-			SELECT currval('notice_tasks_task_id_seq')
+			SELECT currval('notice.notice_tasks_task_id_seq')
 		</selectKey>
 
 		insert into notice.notice_tasks
