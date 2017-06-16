@@ -1,10 +1,10 @@
 package com.spiderdt.common.notice.common;
 
 import com.alibaba.fastjson.JSONObject;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;
 import java.util.List;
@@ -17,6 +17,7 @@ import java.util.regex.Pattern;
  * Created by fivebit on 2017/5/11.
  * common tools about string/date/others
  */
+@Repository
 public class Utils {
     private static Logger log = LoggerFactory.getLogger(Utils.class);
 
@@ -189,34 +190,39 @@ public class Utils {
         return map_json;
     }
 
+//    /**
+//     * 从文本中，获取其中一个URL并返回
+//     * @param message
+//     * @return
+//     */
+//    public static String getUrlFromMessage(String message){
+//        Pattern pb = Pattern.compile("(?<!\\d)(?:(?:[\\w[.-://]]*\\.[com|cn|net|tv|gov|org|biz|cc|uk|jp|edu]+[^\\s|^\\u4e00-\\u9fa5]*))");
+//        Matcher mb = pb.matcher(message);
+//        String url = "";
+//        if(mb.find()) {
+//            url = mb.group();
+//        }
+//        return url;
+//    }
+//
     /**
-     * 从文本中，获取其中一个URL并返回
+     * 获取所有的url并返回，Map<Order, Link>
      * @param message
      * @return
      */
-    public static String getUrlFromMessage(String message){
-        Pattern pb = Pattern.compile("(?<!\\d)(?:(?:[\\w[.-://]]*\\.[com|cn|net|tv|gov|org|biz|cc|uk|jp|edu]+[^\\s|^\\u4e00-\\u9fa5]*))");
-        Matcher mb = pb.matcher(message);
-        String url = "";
-        if(mb.find()) {
-            url = mb.group();
-        }
-        return url;
-    }
+    public static HashMap<Integer, String> getUrlsFromMessage(String message){
 
-    /**
-     * 获取所有的url并返回
-     * @param message
-     * @return
-     */
-    public static List<String> getUrlsFromMessage(String message){
-        Pattern pb = Pattern.compile("(?<!\\d)(?:(?:[\\w[.-://]]*\\.[com|cn|net|tv|gov|org|biz|cc|uk|jp|edu]+[^\\s|^\\u4e00-\\u9fa5]*))");
-        Matcher mb = pb.matcher(message);
-        List<String> urls = Lists.newArrayList();
-        while(mb.find()) {
-            urls.add(mb.group());
+        Pattern patternHttp = Pattern.compile("<a.*?href=[\"']?((https?://)?/?[^\"']+)[\"']?.*?>(.+)</a>");
+        Matcher matcher = patternHttp.matcher(message);
+        HashMap<Integer, String> linkOrderMap = new HashMap<Integer, String>();
+        int i = 0;
+        while(matcher.find()) {
+            String link = matcher.group(1).trim();
+            linkOrderMap.put(i, link);
+            i++;
         }
-        return urls;
+
+        return linkOrderMap;
     }
 
     /**
@@ -226,16 +232,24 @@ public class Utils {
      * @param new_url
      * @return
      */
-    public static String replaceUrlFromMessage(String message,String new_url){
-        Pattern pb = Pattern.compile("(?<!\\d)(?:(?:[\\w[.-://]]*\\.[com|cn|net|tv|gov|org|biz|cc|uk|jp|edu]+[^\\s|^\\u4e00-\\u9fa5]*))");
-        String re_message = message;
-        Matcher mb = pb.matcher(message);
-        if (mb.find()) {
-            Jlog.info("replace url:" + mb.group()+" new url:"+new_url);
-            re_message = mb.replaceAll(new_url);
-        }
-        return re_message;
-    }
+//    public static String replaceUrlFromMessage(String message,String new_url){
+//        Pattern pb = Pattern.compile("(?<!\\d)(?:(?:[\\w[.-://]]*\\.[com|cn|net|tv|gov|org|biz|cc|uk|jp|edu]+[^\\s|^\\u4e00-\\u9fa5]*))");
+//        String re_message = message;
+//        Matcher mb = pb.matcher(message);
+//        if (mb.find()) {
+//            Jlog.info("replace url:" + mb.group()+" new url:"+new_url);
+//            re_message = mb.replaceAll(new_url);
+//        }
+//        return re_message;
+//    }
+
+    /**
+     * 替换 a 标签链接
+     * @param message
+     * @param old_url
+     * @param new_url
+     * @return
+     */
     public static String replaceUrlFromMessage(String message,String old_url,String new_url){
         Pattern pb = Pattern.compile(old_url);
         String re_message = message;
