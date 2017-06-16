@@ -16,8 +16,6 @@ import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.net.URLEncoder;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -30,27 +28,6 @@ public class EmailService {
     @Autowired
     private JavaMailSenderImpl sender;
 
-    /**
-     * 发送文本邮件
-     * @param desEmailAddr
-     * @param subject
-     * @param content
-     */
-    public void sendText (String desEmailAddr, String subject, String content) {
-        MimeMessage mimeMsg = sender.createMimeMessage();
-        MimeMessageHelper helper = null;
-        try {
-            helper = new MimeMessageHelper(mimeMsg, true, "utf-8");
-            helper.setText(content, false);
-            helper.setTo(desEmailAddr);
-            helper.setSubject(subject);
-            helper.setFrom(sender.getUsername());
-        } catch (MessagingException e) {
-            e.printStackTrace();
-        }
-        Jlog.info("------------ sendTextEmail");
-        sender.send(mimeMsg);
-    }
 
     /**
      * 发送 Html 邮件
@@ -189,63 +166,6 @@ public class EmailService {
         sender.send(mimeMsg);
     }
 
-    /**
-     * 发送一张图片邮件
-     * @param desEmailAddr
-     * @param subject
-     * @param content
-     * @param imgId 在 content 中必须有 <img src="cid:%s"/>
-     * @param path 图片路径
-     */
-    public void sendPhoto(String desEmailAddr, String subject, String content, String imgId, String path) {
-        MimeMessage mimeMsg = sender.createMimeMessage();
-        MimeMessageHelper helper = null;
-        try {
-            helper = new MimeMessageHelper(mimeMsg, true, "utf-8");
-            // format 用于加入图片位置
-            content = String.format(content, imgId);
-            helper.setText(content, true);
-            // 添加内嵌图片
-            FileSystemResource img = new FileSystemResource(new File(path));
-            helper.addInline(imgId, img);
-            helper.setTo(desEmailAddr);
-            helper.setSubject(subject);
-            helper.setFrom(sender.getUsername());
-        } catch (MessagingException e) {
-            e.printStackTrace();
-        }
-
-        Jlog.info("------------ sendPhotoEmail");
-        sender.send(mimeMsg);
-    }
-
-    public void sendPhoto(String desEmailAddr, String subject, String content, HashMap<Integer, String> imgIdMap, HashMap<Integer, String> imgPathMap) {
-        MimeMessage mimeMsg = sender.createMimeMessage();
-        MimeMessageHelper helper = null;
-        try {
-            helper = new MimeMessageHelper(mimeMsg, true, "utf-8");
-            for(HashMap.Entry<Integer, String> entry: imgIdMap.entrySet()) {
-                int order = entry.getKey();
-                String imgId = entry.getValue();
-                String imgPath = imgPathMap.get(order);
-                // format 用于加入图片位置
-                content = String.format(content, imgId);
-                helper.setText(content, true);
-                // 添加内嵌图片
-                FileSystemResource img = new FileSystemResource(new File(imgPath));
-                helper.addInline(imgId, img);
-            }
-
-            helper.setTo(desEmailAddr);
-            helper.setSubject(subject);
-            helper.setFrom(sender.getUsername());
-        } catch (MessagingException e) {
-            e.printStackTrace();
-        }
-
-        Jlog.info("------------ sendPhotoEmail");
-        sender.send(mimeMsg);
-    }
 
     /**
      * 批量发送邮件
@@ -253,7 +173,9 @@ public class EmailService {
      * @return
      */
     public Boolean sendEmailBatch(List<NoticeTasksResultEntity> items){
-
+        for (NoticeTasksResultEntity item: items) {
+            sendHtml(item.getAddress(), item.getSubject(), item.getMessage());
+        }
         return true;
     }
 

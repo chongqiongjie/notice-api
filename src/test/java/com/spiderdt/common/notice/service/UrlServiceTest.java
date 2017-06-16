@@ -1,5 +1,6 @@
 package com.spiderdt.common.notice.service;
 
+import com.spiderdt.common.notice.entity.TrackRecodeEntity;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +51,11 @@ public class UrlServiceTest {
 
     @Test
     public void getTrackRecodeByEncrypt() throws Exception {
+
+//        TrackRecodeEntity trackRecodeEntity = urlService.getTrackRecodeByEncrypt("BCE955064F90DCDE086E61BC17E093D2");
+        TrackRecodeEntity trackRecodeEntity1 = urlService.getTrackRecodeByEncrypt("BCE955064F90DCDE086E61BC17E093D2");
+
+
     }
 
     @Test

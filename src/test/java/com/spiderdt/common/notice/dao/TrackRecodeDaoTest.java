@@ -23,7 +23,7 @@ public class TrackRecodeDaoTest {
 
     @Test
     public void testTrackRecodeDao() throws Exception {
-        boolean result = trackRecodeDao.updateTrackRecodeStatus("track_url_suffix_test", 5);
+        boolean result = trackRecodeDao.updateTrackRecodeStatus("track_url_suffix_test", 5, "323");
         System.out.println(result);
     }
 
