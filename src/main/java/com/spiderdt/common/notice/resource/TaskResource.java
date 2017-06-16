@@ -47,7 +47,7 @@ public class TaskResource {
         //get user info
         NoticeTasksEntity noticeTasksEntity = new NoticeTasksEntity();
         noticeTasksEntity.initByTaskInput(task_param);
-        Boolean st = noticeTaskService.createNoticTask(noticeTasksEntity);
+        Boolean st = noticeTaskService.createNoticeTask(noticeTasksEntity);
         slog.info("create task end:st:"+st+" param:"+task_param.toString());
         return Response.status(Response.Status.CREATED)// 201
                 .entity(Utils.getRespons()).build();
