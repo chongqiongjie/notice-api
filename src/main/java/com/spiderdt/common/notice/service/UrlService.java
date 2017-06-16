@@ -1,5 +1,6 @@
 package com.spiderdt.common.notice.service;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Maps;
 import com.spiderdt.common.notice.common.*;
@@ -10,6 +11,8 @@ import com.spiderdt.common.notice.entity.TrackRecodeEntity;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -132,7 +135,7 @@ public class UrlService {
     public TrackRecodeEntity getTrackRecodeByEncrypt(String encrypt_code){
         TrackRecodeEntity trackRecodeEntity = trackRecodeDao.getTrackRecodeInfoByEncrypt(encrypt_code);
         if(trackRecodeEntity != null){
-            trackRecodeEntity.setMapParams(Utils.json2map(JSONObject.parseObject(trackRecodeEntity.getParams())));
+            trackRecodeEntity.setMapParams((Map<String, String>)JSON.parse(trackRecodeEntity.getParams()));
         }
         Jlog.info("getTrackRecodeByEncrypt: trackRecodeEntity"+ trackRecodeEntity);
         return trackRecodeEntity;
@@ -141,8 +144,8 @@ public class UrlService {
 
     public Boolean updateTaskResultByTrackInfo(Map<String,String> track_info){
         String track_url_suffix = track_info.get("track_url_suffix");
-
-        trackRecodeDao.updateTrackRecodeStatus(track_url_suffix,1);
+        long updateTime = new Date().getTime();
+        trackRecodeDao.updateTrackRecodeStatus(track_url_suffix,1, (new Timestamp(updateTime).toString()));
         return true;
     }
 
