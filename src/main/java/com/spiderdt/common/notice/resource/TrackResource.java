@@ -12,7 +12,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * Created by fivebit on 2017/6/1.
@@ -38,13 +37,14 @@ public class TrackResource {
         urlService.updateTaskResultByTrackInfo(trackUrlOrgInfo);
         Jlog.info("do track url end:"+encrypt_url);
         String orgUrl =  trackUrlOrgInfo.get("org_url");
-        if(Objects.equals(orgUrl, "")) {
-            // click url
+        if(orgUrl.startsWith("img_track_url")) {
+            // open 图片 src
+            Jlog.info("email open ------------------------------------");
             return Response.status(Response.Status.CREATED)// 201
                     .entity(Utils.getRespons()).build();
         }else {
-            // open 图片 src
-            Jlog.info("org_url:" + orgUrl);
+            // click url
+            Jlog.info("email link click " + orgUrl + " ------------------------------------");
             return Response.seeOther(URI.create(trackUrlOrgInfo.get("org_url"))).build();
         }
     }
