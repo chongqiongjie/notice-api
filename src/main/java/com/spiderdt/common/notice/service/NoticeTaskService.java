@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -44,7 +45,7 @@ public class NoticeTaskService {
     protected  String json_address_key = "address"; //phone/email
     protected  String url_ac = "click";
     protected  String track_type = "click";
-    protected  String image_track_type = "image";
+    protected  String image_track_type = "open";
 
     /**
      * 通过间隔的扫描数据库状态，获取任务,发送短息/email
@@ -73,7 +74,7 @@ public class NoticeTaskService {
      * @param noticeTasksEntity
      * @return
      */
-    public Boolean createNoticTask(NoticeTasksEntity noticeTasksEntity) throws AppException {
+    public Boolean createNoticeTask(NoticeTasksEntity noticeTasksEntity) throws AppException {
         slog.debug("create notice task:"+noticeTasksEntity);
         noticeTasksEntity.setParentTaskId(0);
         noticeTasksEntity.setStatus("new");
@@ -119,8 +120,9 @@ public class NoticeTaskService {
      */
     public String getAddressesFromJobId(String job_id){
 
-
-        String ret = "[{\"name\":\"qiong\",\"address\":\"18217168545\"}]";
+        Jlog.info("getAddressesFromJobId job_id:" + job_id);
+//        String ret = "[{\"name\":\"qiong\",\"address\":\"18217168545\"}]";
+        String ret = "[{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"}]";
         return ret;
 
     }
@@ -184,26 +186,30 @@ public class NoticeTaskService {
      */
     public List<TrackRecodeEntity> makeTrackRecodeInfo(NoticeTasksResultEntity noticeTasksResultEntity){
         //抽取message中所有的url。
-        List<String> org_urls = Utils.getUrlsFromMessage(noticeTasksResultEntity.getMessage());
+        HashMap<Integer, String> orgUrlsOrderMap = Utils.getUrlsFromMessage(noticeTasksResultEntity.getMessage());
         List<TrackRecodeEntity> tr_lists = Lists.newArrayList();
-        for(String org_url:org_urls){
+        for (Map.Entry<Integer, String> entry : orgUrlsOrderMap.entrySet()) {
+            System.out.println("Key = " + entry.getKey() + ", Value = "  + entry.getValue());
             TrackRecodeEntity tr_entity = new TrackRecodeEntity();
             Map<String,String> trackUrlParam = Maps.newHashMap();
-            trackUrlParam.put("dest_url",org_url);
+            trackUrlParam.put("dest_url",entry.getValue());
             trackUrlParam.put("task_id",String.valueOf(noticeTasksResultEntity.getTaskId()));
             trackUrlParam.put("riid",noticeTasksResultEntity.getRiid());
             trackUrlParam.put("sc",noticeTasksResultEntity.getTaskType());      //使用任务类型 sms/email
             trackUrlParam.put("ac",this.url_ac);
+            //  针对多个 a 链接
+            trackUrlParam.put("id", entry.getKey().toString());
             Map<String,String> urlPair = urlService.makeTrackUrlPair(trackUrlParam);
-            tr_entity.setTrackUrlSuffix(urlPair.get(org_url));
+            tr_entity.setTrackUrlSuffix(urlPair.get(entry.getValue()));
             tr_entity.setTrackType(this.track_type);
-            tr_entity.setUrlOrg(org_url);
+            tr_entity.setUrlOrg(entry.getValue());
             tr_entity.setTaskId(noticeTasksResultEntity.getTaskId());
             tr_entity.setRiid(noticeTasksResultEntity.getRiid());
             tr_entity.setMessageOrg(noticeTasksResultEntity.getMessage());
-            tr_entity.setParams(trackUrlParam.toString());
+            tr_entity.setParams(JSON.toJSONString(trackUrlParam));
             tr_lists.add(tr_entity);
         }
+
         if(noticeTasksResultEntity.getTaskType().equals(AppConstants.EMAIL_TASK_TYPE) == true){     //需要额外的打开跟踪链接
             TrackRecodeEntity tr_entity = new TrackRecodeEntity();
             Map<String,String> trackUrlParam = Maps.newHashMap();
@@ -220,7 +226,7 @@ public class NoticeTaskService {
             tr_entity.setTaskId(noticeTasksResultEntity.getTaskId());
             tr_entity.setRiid(noticeTasksResultEntity.getRiid());
             tr_entity.setMessageOrg(noticeTasksResultEntity.getMessage());
-            tr_entity.setParams(trackUrlParam.toString());
+            tr_entity.setParams(JSON.toJSONString(trackUrlParam));
             tr_lists.add(tr_entity);
         }
         return tr_lists;
@@ -249,13 +255,13 @@ public class NoticeTaskService {
      * @param track_url
      * @return
      */
-    public String replaceUrlFromMessage(String task_type,String message,String org_url,String track_url){
-        String short_url = track_url;
+    public String replaceUrlFromMessage(String task_type,String message,String org_url,String track_url) {
+        String short_url = "";
         if(task_type.equals(AppConstants.SMS_TASK_TYPE) == true){
             short_url = urlService.makeShortUrl(track_url);
-        }
-        if(task_type.equals(AppConstants.EMAIL_TASK_TYPE) == true){
-            short_url = "<a target=_blank href=\""+track_url+"\">"+org_url+"</a>";
+        }else if (task_type.equals(AppConstants.EMAIL_TASK_TYPE) == true){
+//            short_url = "<a target=_blank href=\""+track_url+"\">"+org_url+"</a>";
+            short_url = track_url;
         }
         message = Utils.replaceUrlFromMessage(message,org_url,short_url);
         return message;
@@ -271,7 +277,7 @@ public class NoticeTaskService {
             for(TrackRecodeEntity tr: trackRecodeEntities){
                if(tr.getTrackType().equals(this.image_track_type) == true){
                    String track_url = Jurl.getCompleteTrackUrl(tr.getTrackUrlSuffix());
-                   track_url = "<img src=\""+track_url+"\" />";
+                   track_url = "<img src=\""+track_url+"\" width=\"0\" height=\"0\" style=\"display: none\"/>";
                    return item.getMessage()+ track_url;
                }
             }
