@@ -26,7 +26,7 @@ public interface TrackRecodeDao {
      */
     public Boolean addTrackRecodeInfoBatch(List<TrackRecodeEntity> trackRecodeEntities);
 
-    public Boolean updateTrackRecodeStatus(@Param("encrypt_url") String encrypt_url, @Param("status") Integer status, @Param("clickTime") String clickTime);
+    public Boolean updateTrackRecodeStatus(@Param("encrypt_url") String encrypt_url, @Param("status") int status, @Param("clickTime") String clickTime);
 
 }
 
