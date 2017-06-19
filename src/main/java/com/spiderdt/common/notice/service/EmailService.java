@@ -18,6 +18,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -35,16 +36,14 @@ public class EmailService {
     private TasksResultDao tasksResultDao;
 
     /**
-     * 发送 Html 邮件
+     * 设置发送邮件的基本信息, 包括地址，主题，内容
      * @param desEmailAddr
      * @param subject
      * @param content
+     * @param helper
      */
-    public void sendHtml(String desEmailAddr, String subject, String content) {
-        MimeMessage mimeMsg = sender.createMimeMessage();
-        MimeMessageHelper helper = null;
+    public void setEmailBasicInfo(String desEmailAddr, String subject, String content, MimeMessageHelper helper) {
         try {
-            helper = new MimeMessageHelper(mimeMsg, true, "utf-8");
             helper.setText(content,true);
             helper.setTo(desEmailAddr);
             helper.setSubject(subject);
@@ -53,8 +52,7 @@ public class EmailService {
             e.printStackTrace();
         }
 
-        Jlog.info("------------ sendHtmlEmail");
-        sender.send(mimeMsg);
+        Jlog.info("------------ add desEmailAddr subject content");
     }
 
     /**
@@ -99,55 +97,13 @@ public class EmailService {
         }
     }
 
-
-
     /**
-     * 发送附件邮件
-     * @param desEmailAddr
-     * @param subject
-     * @param content
-     * @param path 附件路径
+     * 设置发送多个附件的邮件
+     * @param paths 多个附件 path 的集合
+     * @param helper
      */
-    public void sendAttachment(String desEmailAddr, String subject, String content, String path) {
-        MimeMessage mimeMsg = sender.createMimeMessage();
-        MimeMessageHelper helper = null;
+    public void setAttachments(ArrayList<String> paths, MimeMessageHelper helper) {
         try {
-            helper = new MimeMessageHelper(mimeMsg, true, "utf-8");
-            helper.setText(content, true);
-            // 添加附件
-            FileSystemResource file = new FileSystemResource(new File(path));
-            //用于解决邮件显示附件名中含有中文
-            ClassPathResource fileName = new ClassPathResource(path);
-            try {
-                helper.addAttachment(MimeUtility.encodeWord(fileName.getFilename()), file);
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-            }
-            helper.setTo(desEmailAddr);
-            helper.setSubject(subject);
-            helper.setFrom(sender.getUsername());
-        } catch (MessagingException e) {
-            e.printStackTrace();
-        }
-
-        Jlog.info("------------ sendAttachmentEmail");
-        sender.send(mimeMsg);
-    }
-
-
-    /**
-     * 发送多个附件邮件
-     * @param desEmailAddr
-     * @param subject
-     * @param content
-     * @param path 附件路径
-     */
-    public void sendAttachments(String desEmailAddr, String subject, String content,List<String> paths) {
-        MimeMessage mimeMsg = sender.createMimeMessage();
-        MimeMessageHelper helper = null;
-        try {
-            helper = new MimeMessageHelper(mimeMsg, true, "utf-8");
-            helper.setText(content, true);
             // 添加附件
             for (String path:paths) {
                 FileSystemResource file = new FileSystemResource(new File(path));
@@ -159,21 +115,15 @@ public class EmailService {
                     e.printStackTrace();
                 }
             }
-
-            helper.setTo(desEmailAddr);
-            helper.setSubject(subject);
-            helper.setFrom(sender.getUsername());
         } catch (MessagingException e) {
             e.printStackTrace();
         }
-
-        Jlog.info("------------ sendAttachmentEmail");
-        sender.send(mimeMsg);
+        Jlog.info("------------ add attachments");
     }
 
 
     /**
-     * 批量发送邮件
+     * 批量发送邮件, 并且更新 notice_tasks_result_info 表
      * @param items
      * @return
      */
@@ -183,11 +133,19 @@ public class EmailService {
 
         String detailInfo;
         String sendStatus;
-
+        ArrayList<String> paths = new ArrayList<>();
+        paths.add("G:\\SpiderData\\code\\common-service\\notice-api\\spiderdt-notice.md");
+        paths.add("G:\\SpiderData\\code\\common-service\\notice-api\\run.sh");
         for (NoticeTasksResultEntity item: items) {
             try {
                 sendTime = new Date().getTime();
-                sendHtml(item.getAddress(), item.getSubject(), item.getMessage());
+                MimeMessage mimeMsg = sender.createMimeMessage();
+                MimeMessageHelper helper = new MimeMessageHelper(mimeMsg, true, "utf-8");
+
+                setEmailBasicInfo(item.getAddress(), item.getSubject(), item.getMessage(), helper);
+                setAttachments(paths, helper);
+                sender.send(mimeMsg);
+
                 detailInfo = "success";
                 sendStatus = "success";
             } catch (Exception ee) {
