@@ -1,6 +1,7 @@
 package com.spiderdt.common.notice.service;
 
 import com.spiderdt.common.notice.common.Jlog;
+import com.spiderdt.common.notice.dao.TasksResultDao;
 import com.spiderdt.common.notice.entity.NoticeTasksResultEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -16,6 +17,8 @@ import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -28,6 +31,8 @@ public class EmailService {
     @Autowired
     private JavaMailSenderImpl sender;
 
+    @Autowired
+    private TasksResultDao tasksResultDao;
 
     /**
      * 发送 Html 邮件
@@ -173,8 +178,26 @@ public class EmailService {
      * @return
      */
     public Boolean sendEmailBatch(List<NoticeTasksResultEntity> items){
+        long sendTime = 0;
+        long backTime = 0;
+
+        String detailInfo;
+        String sendStatus;
+
         for (NoticeTasksResultEntity item: items) {
-            sendHtml(item.getAddress(), item.getSubject(), item.getMessage());
+            try {
+                sendTime = new Date().getTime();
+                sendHtml(item.getAddress(), item.getSubject(), item.getMessage());
+                detailInfo = "success";
+                sendStatus = "success";
+            } catch (Exception ee) {
+                Jlog.error("send emailAddress:"+item.getAddress());
+                Jlog.error("send email error:"+ee.getMessage());
+                detailInfo = ee.getMessage();
+                sendStatus = "failed";
+            }
+            backTime = new Date().getTime();
+            tasksResultDao.updateNoticeTaskBackInfoStatus(item.getRiid(), sendStatus, detailInfo, (new Timestamp(sendTime).toString()), (new Timestamp(backTime).toString()));
         }
         return true;
     }
