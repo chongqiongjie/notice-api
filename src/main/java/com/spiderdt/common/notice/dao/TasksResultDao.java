@@ -37,8 +37,5 @@ public interface TasksResultDao {
                                                    @Param("detail_info") String detail_info,
                                                    @Param("send_time") String send_time,
                                                    @Param("back_time") String back_time);
-    public Boolean updateNoticeTaskTrackInfo(@Param("track_url_suffix") String track_url_suffix,
-                                             @Param("ac") String ac,
-                                             @Param("status") String status,
-                                             @Param("atime") String atime);
+
 }

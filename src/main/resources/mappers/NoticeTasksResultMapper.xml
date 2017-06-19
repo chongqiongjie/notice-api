@@ -46,18 +46,7 @@
         back_time=#{back_time}
         where riid=#{msgid};
     </update>
-    <update id="updateNoticeTaskTrackInfo">
-        update notice.notice_tasks_result_info
-        <choose>
-            <when test="ac='show'">
-                set is_open=#{status},open_time=#{atime}
-            </when>
-            <when test="ac='click'">
-                set is_click=#{status},open_time=#{atime}
-            </when>
-        </choose>
-        where track_url_suffix=#{track_url_suffix};
-    </update>
+
 
 
 </mapper>

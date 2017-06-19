@@ -29,7 +29,8 @@
     </select>
     <update id="updateTrackRecodeStatus">
         update notice.notice_tasks_track_recode
-        set is_click=#{status}
+        set is_click = #{status},
+           click_time = #{clickTime}
         where track_url_suffix =#{encrypt_url};
     </update>
 
