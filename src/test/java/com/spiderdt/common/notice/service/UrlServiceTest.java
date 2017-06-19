@@ -53,7 +53,7 @@ public class UrlServiceTest {
     public void getTrackRecodeByEncrypt() throws Exception {
 
 //        TrackRecodeEntity trackRecodeEntity = urlService.getTrackRecodeByEncrypt("BCE955064F90DCDE086E61BC17E093D2");
-        TrackRecodeEntity trackRecodeEntity1 = urlService.getTrackRecodeByEncrypt("BCE955064F90DCDE086E61BC17E093D2");
+        TrackRecodeEntity trackRecodeEntity1 = urlService.getTrackRecodeByEncrypt("2CAC3CB01D27CD03A63B856DE49CA6BA");
 
 
     }

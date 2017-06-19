@@ -1,5 +1,6 @@
 package com.spiderdt.common.notice.service;
 
+import com.spiderdt.common.notice.entity.NoticeTasksResultEntity;
 import junit.framework.TestCase;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -55,6 +56,7 @@ public class EmailServiceTest extends TestCase {
 //        html = String.format(html, "http://localhost:8080/track/123456");
         System.out.println(html);
 //        emailService.sendHtml("ran.bo@spiderdt.com", "htmlTest", html);
+//        emailService.sendHtml("3334qeree@16.com", "htmlTest", html);
 
     }
 
@@ -105,4 +107,34 @@ public class EmailServiceTest extends TestCase {
     }
 
 
+    @Test
+    public void sendEmailBatch() {
+        List<NoticeTasksResultEntity> items = new ArrayList<>();
+        NoticeTasksResultEntity item = new NoticeTasksResultEntity();
+        item.setAddress("ran.bo@spiderdt.com");
+        item.setMessage("test 您好 <!DOCTYPE html>\n" +
+                "<html lang=\"en\">\n" +
+                "<head>\n" +
+                "<meta charset=\"UTF-8\">\n" +
+                "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n" +
+                "<meta http-equiv=\"X-UA-Compatible\" content=\"ie=edge\">\n" +
+                "<title>Document</title>\n" +
+                "</head>\n" +
+                "<body style=\"color: #666\">\n" +
+                "<p><strong>您好:</strong></p >\n" +
+                "<img src=\"http://localhost:8080/track/open123\" width=\"0\" height=\"0\" style=\"display: none\">\n" +
+                "</body>\n" +
+                "<style>\n" +
+                "a:hover {\n" +
+                "color: #5b9ed8 !important;\n" +
+                "text-decoration: underline !important;\n" +
+                "}\n" +
+                "<a style=\"color: #337ab7; text-decoration: none;\" href=\"http://127.0.0.1:8080/track/8BB2E5DC6B7AA17773D24E130102D86Bd?ticket=b9387ba1606a5537e18acef496f033c516551b8a\" target=\"_blank\">点击此处更改密码</a>}\n" +
+                "<a  href=\"http://127.0.0.1:8080/track/8BB2E5DC6B7AA17773D24E130102D86B\" target=\"_blank\">点击此处更改密码</a></style>\n" +
+                "<a href=\"http://127.0.0.1:8080/track/1046E46456207935E9FFFC2DB8CE0DE0\">3</a></html><img src=\"http://127.0.0.1:8080/track/2CAC3CB01D27CD03A63B856DE49CA6BA\" width=\"0\" height=\"0\" style=\"display: none\"/>");
+        item.setRiid("47b583823b274267be0cc874f0d6697c");
+//        item.setSubject("Test Email");
+        items.add(item);
+        emailService.sendEmailBatch(items);
+    }
 }
