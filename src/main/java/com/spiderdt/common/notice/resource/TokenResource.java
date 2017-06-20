@@ -8,6 +8,7 @@ import com.spiderdt.common.notice.service.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -29,6 +30,7 @@ public class TokenResource {
 //
     @POST
     public Response token(Map<String,String> params){
+
         String encodeStr = "";
         String token = "";
         try {
