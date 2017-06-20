@@ -60,7 +60,7 @@ public class EmailServiceTest extends TestCase {
                 "<a href=\"http://127.0.0.1:8080/track/1046E46456207935E9FFFC2DB8CE0DE0\">3</a></html><img src=\"http://127.0.0.1:8080/track/2CAC3CB01D27CD03A63B856DE49CA6BA\" width=\"0\" height=\"0\" style=\"display: none\"/>");
         item.setRiid("47b583823b274267be0cc874f0d6697c");
         item.setSubject("Test Email");
-        items.add(item);
+        item.setTaskId(33);
         items.add(item);
         emailService.sendEmailBatch(items);
     }

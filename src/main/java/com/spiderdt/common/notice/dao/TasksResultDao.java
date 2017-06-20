@@ -11,6 +11,7 @@ import java.util.List;
  */
 @Repository
 public interface TasksResultDao {
+
     public void createNoticeTaskResultBatch(List<NoticeTasksResultEntity> noticeTasksEntitys);
 
     /**
@@ -32,6 +33,16 @@ public interface TasksResultDao {
                                                 @Param("status") String status,
                                                 @Param("detail_info") String detail_info,
                                                 @Param("submit_time") String submit_time);
+
+    /**
+     * 更新状态、详情、发送时间、反馈时间
+     * @param msgid
+     * @param status
+     * @param detail_info
+     * @param send_time
+     * @param back_time
+     * @return
+     */
     public Boolean updateNoticeTaskBackInfoStatus( @Param("msgid") String msgid,
                                                    @Param("status") String status,
                                                    @Param("detail_info") String detail_info,
