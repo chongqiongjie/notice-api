@@ -1,5 +1,7 @@
 package com.spiderdt.common.notice.service;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.spiderdt.common.notice.entity.NoticeTasksResultEntity;
 import junit.framework.TestCase;
 import org.junit.Test;
@@ -10,6 +12,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author ranran
@@ -25,12 +28,6 @@ public class EmailServiceTest extends TestCase {
 
     @Autowired
     private EmailService emailService;
-
-
-    @Test
-    public void download(){
-       emailService.download("http://www.qqleju.com/uploads/allimg/130618/18-110930_9.jpg", "chong");
-    }
 
 
     @Test
@@ -64,4 +61,19 @@ public class EmailServiceTest extends TestCase {
         items.add(item);
         emailService.sendEmailBatch(items);
     }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void TestString2Json() {
+        String testString = "[{\"fileName\":\"test.jpg\", \"downloadUrl\":\"http://www.qqleju.com/uploads/allimg/130618/18-110930_9.jpg\"}, {\"fileName\":\"test2.jpg\", \"downloadUrl\":\"http://www.qqleju.com/uploads/allimg/130618/18-110930_9.jpg\"}]";
+        JSONArray jsonArray = JSON.parseArray(testString);
+        for (Object jsonObject : jsonArray) {
+            Map<String, String> attachmentAttributeMap = (Map<String, String>) jsonObject;
+            System.out.println(attachmentAttributeMap);
+            System.out.println(attachmentAttributeMap.get("downloadUrl"));
+            System.out.println(attachmentAttributeMap.get("fileName"));
+
+        }
+    }
+
 }

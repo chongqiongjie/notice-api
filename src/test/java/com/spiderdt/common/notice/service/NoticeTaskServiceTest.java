@@ -58,7 +58,7 @@ public class NoticeTaskServiceTest {
         noticeTasksEntity.setMessage("#name# 您好 " + html);
         //如果task_type==sms时
         noticeTasksEntity.setSubject("#name# 专属");
-        noticeTasksEntity.setAttachments("http://xxxxxxx");
+//        noticeTasksEntity.setAttachments("http://xxxxxxx");
         Boolean st = noticeTaskService.createNoticeTask(noticeTasksEntity);
 
     }
