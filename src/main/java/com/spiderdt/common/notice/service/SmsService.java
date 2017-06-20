@@ -80,6 +80,7 @@ public class SmsService extends  NoticeTaskService {
         return msgList;
     }
 
+<<<<<<< HEAD
 
     /**
      * 更新任务状态
@@ -98,6 +99,26 @@ public class SmsService extends  NoticeTaskService {
         }
         return st;
     }
+=======
+//    放在 NoticeTaskSerive 中
+//    /**
+//     * 更新任务状态
+//     * @param task_id
+//     * @param status new/initing/inited/sending/sended/等
+//     * @return
+//     */
+//    public Boolean updateNoticeTaskSatus(Integer task_id,String status){
+//        Boolean st = true;
+//        String update_time = Jdate.getNowStrTime();
+//        try {
+//            noticeTasksDao.updateNoticeTaskStatus(task_id, status, update_time);
+//        }catch(Exception ee){
+//            st = false;
+//            Jlog.error("update notice status error:"+ee.getMessage());
+//        }
+//        return st;
+//    }
+>>>>>>> 1629bd72da21c2df7084856b3b9d5cd250015b08
 
 
     /**

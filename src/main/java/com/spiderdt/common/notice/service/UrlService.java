@@ -11,8 +11,6 @@ import com.spiderdt.common.notice.entity.TrackRecodeEntity;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.sql.Timestamp;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -144,8 +142,8 @@ public class UrlService {
 
     public Boolean updateTaskResultByTrackInfo(Map<String,String> track_info){
         String track_url_suffix = track_info.get("track_url_suffix");
-        long updateTime = new Date().getTime();
-        trackRecodeDao.updateTrackRecodeStatus(track_url_suffix,1, (new Timestamp(updateTime).toString()));
+        String updateTime = Jdate.getNowStrTime();
+        trackRecodeDao.updateTrackRecodeStatus(track_url_suffix,1, updateTime);
         return true;
     }
 

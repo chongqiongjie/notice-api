@@ -38,7 +38,7 @@ public class NoticeTaskServiceTest {
                 "</head>\n" +
                 "<body style=\"color: #666\">\n" +
                 "<p><strong>您好:</strong></p >\n" +
-                "<img src=\"http://localhost:8080/track/open123\" width=\"0\" height=\"0\" style=\"display: none\">\n"+
+                "<img src=\"http://localhost:8080/track/open123\" width=\"0\" height=\"0\" style=\"display: none\">\n" +
                 "</body>\n" +
                 "<style>\n" +
                 "a:hover {\n" +
@@ -107,4 +107,11 @@ public class NoticeTaskServiceTest {
     public void saveTrackRecodeBatch() throws Exception {
     }
 
+    @Test
+    public void getAttachmentByTaskId() {
+        System.out.println(noticeTaskService.getAttachmentByTaskId(30));
+        System.out.println(noticeTaskService.getAttachmentByTaskId(31));
+        System.out.println(noticeTaskService.getAttachmentByTaskId(32));
+        System.out.println(noticeTaskService.getAttachmentByTaskId(33));
+    }
 }

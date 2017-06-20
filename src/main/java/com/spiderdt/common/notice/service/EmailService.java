@@ -187,6 +187,7 @@
 
 package com.spiderdt.common.notice.service;
 
+import com.spiderdt.common.notice.common.Jdate;
 import com.spiderdt.common.notice.common.Jlog;
 import com.spiderdt.common.notice.dao.TasksResultDao;
 import com.spiderdt.common.notice.entity.NoticeTasksResultEntity;
@@ -204,9 +205,13 @@ import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+<<<<<<< HEAD
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
+=======
+import java.util.ArrayList;
+>>>>>>> 1629bd72da21c2df7084856b3b9d5cd250015b08
 import java.util.List;
 
 /**
@@ -221,6 +226,12 @@ public class EmailService {
 
     @Autowired
     private TasksResultDao tasksResultDao;
+<<<<<<< HEAD
+=======
+
+    @Autowired
+    private NoticeTaskService noticeTaskService;
+>>>>>>> 1629bd72da21c2df7084856b3b9d5cd250015b08
 
     /**
      * 设置发送邮件的基本信息, 包括地址，主题，内容
@@ -310,11 +321,16 @@ public class EmailService {
 
 
     /**
+<<<<<<< HEAD
      * 批量发送邮件, 并且更新 notice_tasks_result_info 表
+=======
+     * 批量发送邮件, 并且更新 notice_tasks_result_info 表 和 notice_tacks 表
+>>>>>>> 1629bd72da21c2df7084856b3b9d5cd250015b08
      * @param items
      * @return
      */
     public Boolean sendEmailBatch(List<NoticeTasksResultEntity> items){
+<<<<<<< HEAD
         long sendTime = 0;
         long backTime = 0;
 
@@ -326,13 +342,39 @@ public class EmailService {
         for (NoticeTasksResultEntity item: items) {
             try {
                 sendTime = new Date().getTime();
+=======
+        String sendTime = "";
+        String backTime = "";
+        int taskId;
+        String detailInfo;
+        String sendStatus;
+
+        for (NoticeTasksResultEntity item: items) {
+            taskId = item.getTaskId();
+            noticeTaskService.updateNoticeTaskSatus(taskId, "sending");
+            try {
+                sendTime = Jdate.getNowStrTime();
+>>>>>>> 1629bd72da21c2df7084856b3b9d5cd250015b08
                 MimeMessage mimeMsg = sender.createMimeMessage();
                 MimeMessageHelper helper = new MimeMessageHelper(mimeMsg, true, "utf-8");
 
                 setEmailBasicInfo(item.getAddress(), item.getSubject(), item.getMessage(), helper);
+<<<<<<< HEAD
                 setAttachments(paths, helper);
                 sender.send(mimeMsg);
 
+=======
+
+                ArrayList<String> paths = new ArrayList<>();
+                // TODO 将前端的给的附件下载存入磁盘，然后　paths 为本地的附件路径　
+                paths = noticeTaskService.getAttachmentByTaskId(taskId);
+                // path list 中可能有一个值，但是为 ""
+                if (!"".equals(paths.get(0))) {
+                    setAttachments(paths, helper);
+                }
+
+                sender.send(mimeMsg);
+>>>>>>> 1629bd72da21c2df7084856b3b9d5cd250015b08
                 detailInfo = "success";
                 sendStatus = "success";
             } catch (Exception ee) {
@@ -341,8 +383,16 @@ public class EmailService {
                 detailInfo = ee.getMessage();
                 sendStatus = "failed";
             }
+<<<<<<< HEAD
             backTime = new Date().getTime();
             tasksResultDao.updateNoticeTaskBackInfoStatus(item.getRiid(), sendStatus, detailInfo, (new Timestamp(sendTime).toString()), (new Timestamp(backTime).toString()));
+=======
+            noticeTaskService.updateNoticeTaskSatus(taskId, "sended");
+
+            backTime = Jdate.getNowStrTime();
+            Jlog.info("update notice_tacks_result_info backTime status riid :" + item.getRiid());
+            tasksResultDao.updateNoticeTaskBackInfoStatus(item.getRiid(), sendStatus, detailInfo, sendTime, backTime);
+>>>>>>> 1629bd72da21c2df7084856b3b9d5cd250015b08
         }
         return true;
     }

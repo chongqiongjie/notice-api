@@ -17,10 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by fivebit on 2017/6/5.
@@ -319,12 +316,16 @@ public class NoticeTaskService {
             item.setSendStatus(AppConstants.TASK_RESULT_STATUS_NEW);
             item.setSubmitTime(Jdate.getNowStrTime());
             List<TrackRecodeEntity> trackRecodeEntities = makeTrackRecodeInfo(item);
-            all_trackRecodeEntities.addAll(trackRecodeEntities);
+
             //更换原始URL to track url
             item.setMessage(replaceMessageUrlToTrackUrl(item,trackRecodeEntities));
             //添加结尾隐藏的跟踪链接.邮件需要实现
             item.setMessage( addOpenTrackUrl(item,trackRecodeEntities));
             resultInfoList.add(item );
+            for (TrackRecodeEntity trackRecodeEntity: trackRecodeEntities) {
+                trackRecodeEntity.setMessageReplace(item.getMessage());
+                all_trackRecodeEntities.add(trackRecodeEntity);
+            }
         }
         slog.debug("get NoticeTasksResultEntity:"+resultInfoList);
         try {
@@ -390,5 +391,37 @@ public class NoticeTaskService {
         }
         return st;
     }
+
+    /**
+     * 更新任务状态
+     * @param task_id
+     * @param status new/initing/inited/sending/sended/等
+     * @return
+     */
+    public Boolean updateNoticeTaskSatus(Integer task_id, String status){
+        Boolean st = true;
+        String update_time = Jdate.getNowStrTime();
+        try {
+            noticeTasksDao.updateNoticeTaskStatus(task_id, status, update_time);
+        }catch(Exception ee){
+            st = false;
+            Jlog.error("update notice status error:"+ee.getMessage());
+        }
+        return st;
+    }
+
+    /**
+     * 通过 taskId 获取附件地址
+     * @param taskId
+     * @return 返回 ArrayList
+     */
+    public ArrayList<String> getAttachmentByTaskId(int taskId) {
+        ArrayList<String> attachMentsList = new ArrayList<>();
+        String[] attachMents = noticeTasksDao.getAttachmentByTaskId(taskId).split(";");
+        for (int i = 0; i < attachMents.length; i++) {
+            attachMentsList.add(attachMents[i]);
+        }
+        return attachMentsList;
+    };
 
 }
