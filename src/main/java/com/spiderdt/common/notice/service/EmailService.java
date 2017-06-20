@@ -1,10 +1,13 @@
 package com.spiderdt.common.notice.service;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.spiderdt.common.notice.common.Jdate;
 import com.spiderdt.common.notice.common.Jlog;
 import com.spiderdt.common.notice.dao.TasksResultDao;
 import com.spiderdt.common.notice.entity.NoticeTasksResultEntity;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
@@ -14,12 +17,11 @@ import org.springframework.stereotype.Service;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeUtility;
-import java.io.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
+import java.io.File;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by ranran on 2017/6/6.
@@ -36,6 +38,11 @@ public class EmailService {
 
     @Autowired
     private NoticeTaskService noticeTaskService;
+
+    @Autowired
+    FileService fileService;
+
+    @Value("${attachment.storePath}") String attachmentStorePath;
 
     /**
      * 设置发送邮件的基本信息, 包括地址，主题，内容
@@ -57,47 +64,7 @@ public class EmailService {
         Jlog.info("------------ add desEmailAddr subject content");
     }
 
-    /**
-     * 下载文件到本地
-     * @param urlString 被下载的文件地址
-     * @param filename 本地文件名
-     */
 
-    public  void download(String urlString, String filename)
-    {
-
-        try
-        {
-            URL url = new URL(urlString);
-            // 打开连接
-            URLConnection con = url.openConnection();
-            // 输入流
-            InputStream is = con.getInputStream();
-            // 1K的数据缓冲
-            byte[] bs = new byte[1024];
-            // 读取到的数据长度
-            int len;
-            // 输出的文件流s
-            OutputStream os = new FileOutputStream("/Users/qiong/work/spiderdt/file/" + filename);
-            // 开始读取
-            while ((len = is.read(bs)) != -1) {
-                os.write(bs, 0, len);
-            }
-            // 完毕，关闭所有链接
-            os.close();
-            is.close();
-        }
-        catch (MalformedURLException e)
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        catch (IOException e)
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
 
     /**
      * 设置发送多个附件的邮件
@@ -146,15 +113,28 @@ public class EmailService {
 
                 setEmailBasicInfo(item.getAddress(), item.getSubject(), item.getMessage(), helper);
 
-                ArrayList<String> paths = new ArrayList<>();
-                // TODO 将前端的给的附件下载存入磁盘，然后　paths 为本地的附件路径　
-                paths = noticeTaskService.getAttachmentByTaskId(taskId);
+                String attachmentJsonString = noticeTaskService.getAttachmentByTaskId(taskId);
+                // TODO user
+                String userName = "ran";
+                String userFileDir = attachmentStorePath + userName;
                 // path list 中可能有一个值，但是为 ""
-                if (!"".equals(paths.get(0))) {
+                if (!"".equals(attachmentJsonString)) {
+                    ArrayList<String> paths = new ArrayList<>();
+
+                    JSONArray jsonArray = JSON.parseArray(attachmentJsonString);
+                    for (Object jsonObject : jsonArray) {
+                        Map<String, String> attachmentAttributeMap = (Map<String, String>) jsonObject;
+                        String downloadUrl = attachmentAttributeMap.get("downloadUrl");
+                        String fileName = attachmentAttributeMap.get("fileName");
+                        fileService.download(downloadUrl, userName, fileName);
+                        String singleFilePath =  userFileDir + fileName;
+                        paths.add(singleFilePath);
+                        Jlog.info(attachmentAttributeMap);
+                    }
                     setAttachments(paths, helper);
                 }
-
                 sender.send(mimeMsg);
+                fileService.deleteDirectory(userFileDir);
                 detailInfo = "success";
                 sendStatus = "success";
             } catch (Exception ee) {
