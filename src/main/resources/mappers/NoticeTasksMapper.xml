@@ -40,4 +40,9 @@
 		set status=#{status},update_time=#{update_time}
 		where task_id =#{task_id};
 	</update>
+
+	<select id="getAttachmentByTaskId" resultType="String">
+		select attachments from notice.notice_tasks where task_id=#{taskId};
+	</select>
+
 </mapper>
