@@ -79,7 +79,7 @@ public class NoticeTaskService {
         noticeTasksEntity.setUpdateTime(Jdate.getNowStrTime());
         checkNoticeTaskParams(noticeTasksEntity);
         try {
-            //设置地址和用户名
+            //设置地址和用户名 address 为　json 字符串，多个邮箱
             noticeTasksEntity.setAddresses(getAddressesFromJobId(noticeTasksEntity.getJobId()));
             Integer count = noticeTasksDao.createNoticeTask(noticeTasksEntity);
             if(count !=  1 ){
@@ -119,7 +119,8 @@ public class NoticeTaskService {
 
         Jlog.info("getAddressesFromJobId job_id:" + job_id);
 //        String ret = "[{\"name\":\"qiong\",\"address\":\"18217168545\"}]";
-        String ret = "[{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"}]";
+//        String ret = "[{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"}]";
+        String ret = "[{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"}, {\"name\":\"test2\",\"address\":\"931094193@qq.com\"}]";
         return ret;
 
     }
@@ -285,6 +286,7 @@ public class NoticeTaskService {
     /**
      * 格式化task_result_info信息
      * 这里包括了创建tasks_track_recode信息
+     * 通过 address 这个 json 获取多个 address 存入 task_result_info 信息
      * @param task_id
      * @param noticeTasksEntity
      * @return
@@ -411,17 +413,12 @@ public class NoticeTaskService {
     }
 
     /**
-     * 通过 taskId 获取附件地址
+     * 通过 taskId 获取多个附件属性 json 包括　fileName、downloadUrl
      * @param taskId
-     * @return 返回 ArrayList
+     * @return
      */
-    public ArrayList<String> getAttachmentByTaskId(int taskId) {
-        ArrayList<String> attachMentsList = new ArrayList<>();
-        String[] attachMents = noticeTasksDao.getAttachmentByTaskId(taskId).split(";");
-        for (int i = 0; i < attachMents.length; i++) {
-            attachMentsList.add(attachMents[i]);
-        }
-        return attachMentsList;
+    public String getAttachmentByTaskId(int taskId) {
+        return noticeTasksDao.getAttachmentByTaskId(taskId);
     };
 
 }
