@@ -1,6 +1,5 @@
 package com.spiderdt.common.notice.service;
 
-import com.spiderdt.common.notice.entity.TrackRecodeEntity;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,13 +42,7 @@ public class UrlServiceTest {
     public void saveTrackPairUrlToRedis() throws Exception {
     }
 
-<<<<<<< HEAD
-//    @Test
-//    public void getTrackUrlOrgInfoByEncrypt() throws Exception {
-//        Map<String,String> org_url_and_params = urlService.getTrackUrlOrgInfoByEncrypt("track_url_suffix_test");
-//        System.out.println(org_url_and_params);
-//    }
-=======
+
     @Test
     public void getTrackUrlOrgInfoByEncrypt() throws Exception {
         Map<String,String> org_url_and_params = urlService.getTrackUrlOrgInfoByEncrypt("track_url_suffix_test");
@@ -58,19 +51,7 @@ public class UrlServiceTest {
 
     @Test
     public void getTrackRecodeByEncrypt() throws Exception {
-
-//        TrackRecodeEntity trackRecodeEntity = urlService.getTrackRecodeByEncrypt("BCE955064F90DCDE086E61BC17E093D2");
-        TrackRecodeEntity trackRecodeEntity1 = urlService.getTrackRecodeByEncrypt("2CAC3CB01D27CD03A63B856DE49CA6BA");
->>>>>>> 1629bd72da21c2df7084856b3b9d5cd250015b08
-
-//    @Test
-//    public void getTrackRecodeByEncrypt() throws Exception {
-//
-////        TrackRecodeEntity trackRecodeEntity = urlService.getTrackRecodeByEncrypt("BCE955064F90DCDE086E61BC17E093D2");
-//        TrackRecodeEntity trackRecodeEntity1 = urlService.getTrackRecodeByEncrypt("BCE955064F90DCDE086E61BC17E093D2");
-//
-//
-//    }
+    }
 
     @Test
     public void updateTaskResultByTrackInfo() throws Exception {
