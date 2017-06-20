@@ -45,4 +45,11 @@ public interface NoticeTasksDao {
     public Boolean updateNoticeTaskStatus(@Param("task_id") Integer task_id,
                                           @Param("status") String status,
                                           @Param("update_time") String update_time);
+
+    /**
+     * 通过 taskId 获取附件地址
+     * @param taskId
+     * @return
+     */
+    public String getAttachmentByTaskId(@Param("taskId") int taskId);
 }
