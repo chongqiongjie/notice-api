@@ -51,5 +51,5 @@ public interface NoticeTasksDao {
      * @param taskId
      * @return
      */
-    public String getAttachmentByTaskId(@Param("taskId") int taskId);
+    public NoticeTasksEntity getAttachmentByTaskId(@Param("taskId") int taskId);
 }
