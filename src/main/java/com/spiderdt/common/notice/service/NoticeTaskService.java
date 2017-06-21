@@ -14,6 +14,7 @@ import com.spiderdt.common.notice.entity.NoticeTasksResultEntity;
 import com.spiderdt.common.notice.entity.TrackRecodeEntity;
 import com.spiderdt.common.notice.errorhander.AppException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -27,18 +28,30 @@ import java.util.*;
 public class NoticeTaskService {
     @Resource
     private NoticeTasksDao noticeTasksDao;
+
     @Resource
     private TrackRecodeDao trackRecodeDao;
+
     @Resource
     private TasksResultDao tasksResultDao;
+
     @Resource
     private UrlService urlService;
+
     @Resource
     private SmsService smsService;
+
     @Resource
     private EmailService emailService;
+
     @Autowired
     Slog slog;
+
+    @Autowired
+    FileService fileService;
+
+    @Value("${attachment.storePath}") String attachmentStorePath;
+
     protected  String json_address_key = "address"; //phone/email
     protected  String url_ac = "click";
     protected  String track_type = "click";
@@ -96,6 +109,24 @@ public class NoticeTaskService {
             slog.error("create notice task error:"+ee.getMessage());
             throw new AppException("0","create notice task error");
         }
+
+        // 下载附件
+        String taskId = noticeTasksEntity.getTaskId() + "";
+        String taskFileDir = attachmentStorePath + "/" + taskId + "/" ;
+        String attachmentJsonString = noticeTasksEntity.getAttachments();
+        // path list 中可能有一个值，但是为 ""
+        if (!"".equals(attachmentJsonString)) {
+            ArrayList<String> paths = new ArrayList<>();
+
+            JSONArray jsonArray = JSON.parseArray(attachmentJsonString);
+            for (Object jsonObject : jsonArray) {
+                Map<String, String> attachmentAttributeMap = (Map<String, String>) jsonObject;
+                String downloadUrl = attachmentAttributeMap.get("downloadUrl");
+                String fileName = attachmentAttributeMap.get("fileName");
+                fileService.download(downloadUrl, taskFileDir, fileName);
+            }
+        }
+
         return true;
     }
 
@@ -120,7 +151,7 @@ public class NoticeTaskService {
         Jlog.info("getAddressesFromJobId job_id:" + job_id);
 //        String ret = "[{\"name\":\"qiong\",\"address\":\"18217168545\"}]";
 //        String ret = "[{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"}]";
-        String ret = "[{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"}, {\"name\":\"test2\",\"address\":\"931094193@qq.com\"}]";
+        String ret = "[{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"}, {\"name\":\"test2\",\"address\":\"13458555648@163.com\"}]";
         return ret;
 
     }
@@ -296,9 +327,17 @@ public class NoticeTaskService {
         List<Map<String,String>> addresses_map_list = getAddresssesFromJsonString(noticeTasksEntity.getAddresses());
         List<NoticeTasksResultEntity> resultInfoList =  Lists.newArrayList();
         List<TrackRecodeEntity> all_trackRecodeEntities = Lists.newArrayList();
+        int sizeOfAddressMapList = addresses_map_list.size();
+        int i = 1;
+        boolean isLast = false;
         for(Map<String,String> address_map:addresses_map_list){
+
             NoticeTasksResultEntity item = new NoticeTasksResultEntity();
             String address = address_map.get(this.json_address_key);
+            if(i == addresses_map_list.size()) {
+                Jlog.info("task last addree:" + address);
+                isLast = true;
+            }
             String message = noticeTasksEntity.getMessage();
             String subject = noticeTasksEntity.getSubject();
             for(Map.Entry<String,String> entry : address_map.entrySet()){
@@ -313,6 +352,7 @@ public class NoticeTaskService {
             //trick
             item.setTaskType(noticeTasksEntity.getTaskType());      //主要用于后续流程区分
             item.setAddress(address);
+            item.setLast(isLast);
             item.setMessage(message);       //设置替换URL之前的message。用于传递参数给后面流程,后面会用替换trackurl后的message覆盖。
             item.setSubject(subject);       //如果是sms,可以不用设置。
             item.setSendStatus(AppConstants.TASK_RESULT_STATUS_NEW);
@@ -328,6 +368,7 @@ public class NoticeTaskService {
                 trackRecodeEntity.setMessageReplace(item.getMessage());
                 all_trackRecodeEntities.add(trackRecodeEntity);
             }
+            i += 1;
         }
         slog.debug("get NoticeTasksResultEntity:"+resultInfoList);
         try {
@@ -417,7 +458,7 @@ public class NoticeTaskService {
      * @param taskId
      * @return
      */
-    public String getAttachmentByTaskId(int taskId) {
+    public NoticeTasksEntity getAttachmentByTaskId(int taskId) {
         return noticeTasksDao.getAttachmentByTaskId(taskId);
     };
 
