@@ -10,6 +10,7 @@
 		<result column="user_id" property="userId" jdbcType="VARCHAR" />
 		<result column="addresses" property="addresses" jdbcType="VARCHAR" />
 		<result column="message" property="message" jdbcType="VARCHAR" />
+		<result column="attachments" property="attachments" jdbcType="VARCHAR" />
 		<result column="status" property="status" jdbcType="VARCHAR" />
 		<result column="create_time" property="createTime" jdbcType="VARCHAR" />
 		<result column="update_time" property="updateTime" jdbcType="VARCHAR" />
@@ -41,7 +42,7 @@
 		where task_id =#{task_id};
 	</update>
 
-	<select id="getAttachmentByTaskId" resultType="String">
+	<select id="getAttachmentByTaskId" resultMap="TaskResultMap">
 		select attachments from notice.notice_tasks where task_id=#{taskId};
 	</select>
 
