@@ -26,11 +26,11 @@ public class FileService {
     /**
      * 下载文件到本地
      * @param urlString 被下载的文件地址
-     * @param userName 根据每个用户创建一个文件夹，防止多个用户上传相同文件名的附件
+     * @param taskFileDir 每个 task 一个文件夹
      * @param filename 本地文件名
      */
 
-    public void download(String urlString, String userName, String filename)
+    public void download(String urlString, String taskFileDir, String filename)
     {
         try
         {
@@ -44,12 +44,11 @@ public class FileService {
             // 读取到的数据长度
             int len;
             // 输出的文件流s
-            String saveDirPath = attachmentStorePath +"/" + userName;
-            File saveDir = new File(saveDirPath);
+            File saveDir = new File(taskFileDir);
             if (!saveDir.exists()) {
                 saveDir.mkdir();
             }
-            OutputStream os = new FileOutputStream(saveDirPath +"/"+ filename);
+            OutputStream os = new FileOutputStream(taskFileDir +"/"+ filename);
             // 开始读取
             while ((len = is.read(bs)) != -1) {
                 os.write(bs, 0, len);
