@@ -14,20 +14,21 @@
         <result column="send_time" property="sendTime" jdbcType="VARCHAR" />
         <result column="back_time" property="backTime" jdbcType="VARCHAR" />
         <result column="task_type" property="taskType" jdbcType="VARCHAR" />
+        <result column="is_last" property="isLast" jdbcType="BOOLEAN" />
     </resultMap>
     <select id="getNewNoticeTaskResultsBatch" resultMap="TasksResultMap" parameterType="String">
-        select result.riid,result.task_id,result.address,result.message,result.subject,tasks.task_type
+        select result.riid,result.task_id,result.address,result.message,result.subject,result.is_last,tasks.task_type
         from notice.notice_tasks_result_info  as result
         join notice.notice_tasks as tasks on (tasks.task_id= result.task_id)
         where result.send_status =#{status} limit 200;
     </select>
     <insert id="createNoticeTaskResultBatch" parameterType="java.util.List">
         insert into notice.notice_tasks_result_info
-        (riid,task_id,address,message,subject,send_status,submit_time)
+        (riid,task_id,address,message,subject,send_status,submit_time,is_last)
         values
         <foreach collection="list" item="item" index="index" separator=",">
                 (#{item.riid},#{item.taskId},
-            #{item.address},#{item.message},#{item.subject},#{item.sendStatus},#{item.submitTime})
+            #{item.address},#{item.message},#{item.subject},#{item.sendStatus},#{item.submitTime},#{item.isLast})
         </foreach>
     </insert>
     <update id="updateNoticeTaskResultStatus">
