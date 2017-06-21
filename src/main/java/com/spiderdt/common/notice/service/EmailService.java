@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.spiderdt.common.notice.common.Jdate;
 import com.spiderdt.common.notice.common.Jlog;
 import com.spiderdt.common.notice.dao.TasksResultDao;
+import com.spiderdt.common.notice.entity.NoticeTasksEntity;
 import com.spiderdt.common.notice.entity.NoticeTasksResultEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -75,16 +76,23 @@ public class EmailService {
         try {
             // 添加附件
             for (String path:paths) {
-                FileSystemResource file = new FileSystemResource(new File(path));
+                File file = new File(path);
+                if(!file.exists()) {
+                    // 睡 10s 等待下载文件
+                    Thread.sleep(10000);
+                }
+                FileSystemResource fileSystemResource = new FileSystemResource(file);
                 //用于解决邮件显示附件名中含有中文
                 ClassPathResource fileName = new ClassPathResource(path);
                 try {
-                    helper.addAttachment(MimeUtility.encodeWord(fileName.getFilename()), file);
+                    helper.addAttachment(MimeUtility.encodeWord(fileName.getFilename()), fileSystemResource);
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
                 }
             }
         } catch (MessagingException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
         Jlog.info("------------ add attachments");
@@ -113,10 +121,9 @@ public class EmailService {
 
                 setEmailBasicInfo(item.getAddress(), item.getSubject(), item.getMessage(), helper);
 
-                String attachmentJsonString = noticeTaskService.getAttachmentByTaskId(taskId);
-                // TODO user
-                String userName = "ran";
-                String userFileDir = attachmentStorePath + userName;
+                NoticeTasksEntity tasksEntity = noticeTaskService.getAttachmentByTaskId(taskId);
+                String attachmentJsonString = tasksEntity.getAttachments();
+                String taskFileDir = attachmentStorePath + "/" + taskId;
                 // path list 中可能有一个值，但是为 ""
                 if (!"".equals(attachmentJsonString)) {
                     ArrayList<String> paths = new ArrayList<>();
@@ -126,15 +133,18 @@ public class EmailService {
                         Map<String, String> attachmentAttributeMap = (Map<String, String>) jsonObject;
                         String downloadUrl = attachmentAttributeMap.get("downloadUrl");
                         String fileName = attachmentAttributeMap.get("fileName");
-                        fileService.download(downloadUrl, userName, fileName);
-                        String singleFilePath =  userFileDir + fileName;
+                        String singleFilePath =  taskFileDir + "/" + fileName;
                         paths.add(singleFilePath);
                         Jlog.info(attachmentAttributeMap);
                     }
                     setAttachments(paths, helper);
                 }
                 sender.send(mimeMsg);
-                fileService.deleteDirectory(userFileDir);
+                if(item.isLast()){
+                    fileService.deleteDirectory(taskFileDir);
+                    Jlog.info("is last so delete task attachment dirctory!");
+                    noticeTaskService.updateNoticeTaskSatus(taskId, "sended");
+                }
                 detailInfo = "success";
                 sendStatus = "success";
             } catch (Exception ee) {
@@ -143,8 +153,6 @@ public class EmailService {
                 detailInfo = ee.getMessage();
                 sendStatus = "failed";
             }
-            noticeTaskService.updateNoticeTaskSatus(taskId, "sended");
-
             backTime = Jdate.getNowStrTime();
             Jlog.info("update notice_tacks_result_info backTime status riid :" + item.getRiid());
             tasksResultDao.updateNoticeTaskBackInfoStatus(item.getRiid(), sendStatus, detailInfo, sendTime, backTime);
