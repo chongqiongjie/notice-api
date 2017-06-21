@@ -77,9 +77,9 @@ public class EmailService {
             // 添加附件
             for (String path:paths) {
                 File file = new File(path);
-                if(!file.exists()) {
-                    // 睡 10s 等待下载文件
-                    Thread.sleep(10000);
+                while(!file.exists()) {
+                    // 睡 3s 等待下载文件
+                    Thread.sleep(3000);
                 }
                 FileSystemResource fileSystemResource = new FileSystemResource(file);
                 //用于解决邮件显示附件名中含有中文
