@@ -150,8 +150,8 @@ public class NoticeTaskService {
 
         Jlog.info("getAddressesFromJobId job_id:" + job_id);
 //        String ret = "[{\"name\":\"qiong\",\"address\":\"18217168545\"}]";
-//        String ret = "[{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"}]";
-        String ret = "[{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"}, {\"name\":\"test2\",\"address\":\"13458555648@163.com\"}]";
+        String ret = "[{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"}]";
+//        String ret = "[{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"}, {\"name\":\"test2\",\"address\":\"13458555648@163.com\"}]";
         return ret;
 
     }
