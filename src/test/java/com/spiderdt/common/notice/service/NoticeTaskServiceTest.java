@@ -24,6 +24,9 @@ public class NoticeTaskServiceTest {
 
     @Test
     public void sendNoticeTaskByDbScan() throws Exception {
+
+        noticeTaskService.sendNoticeTaskByDbScan();
+
     }
 
     @Test
@@ -109,9 +112,9 @@ public class NoticeTaskServiceTest {
 
     @Test
     public void getAttachmentByTaskId() {
-        System.out.println(noticeTaskService.getAttachmentByTaskId(30));
-        System.out.println(noticeTaskService.getAttachmentByTaskId(31));
-        System.out.println(noticeTaskService.getAttachmentByTaskId(32));
-        System.out.println(noticeTaskService.getAttachmentByTaskId(33));
+        System.out.println(noticeTaskService.getAttachmentByTaskId(45));
+//        System.out.println(noticeTaskService.getAttachmentByTaskId(31));
+//        System.out.println(noticeTaskService.getAttachmentByTaskId(32));
+//        System.out.println(noticeTaskService.getAttachmentByTaskId(33));
     }
 }

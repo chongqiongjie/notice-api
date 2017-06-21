@@ -51,10 +51,10 @@ public class NoticeTasksDaoTest {
 
     @Test
     public void getAttachmentByTaskId() {
-        System.out.println(noticeTasksDao.getAttachmentByTaskId(30));
-        System.out.println(noticeTasksDao.getAttachmentByTaskId(31));
-        System.out.println(noticeTasksDao.getAttachmentByTaskId(32));
-        System.out.println(noticeTasksDao.getAttachmentByTaskId(33));
+        System.out.println(noticeTasksDao.getAttachmentByTaskId(45));
+//        System.out.println(noticeTasksDao.getAttachmentByTaskId(31));
+//        System.out.println(noticeTasksDao.getAttachmentByTaskId(32));
+//        System.out.println(noticeTasksDao.getAttachmentByTaskId(33));
     }
 
 }
