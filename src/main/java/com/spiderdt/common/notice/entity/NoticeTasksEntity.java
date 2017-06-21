@@ -167,6 +167,7 @@ public class NoticeTasksEntity implements Serializable {
                 ", userId='" + userId + '\'' +
                 ", addresses='" + addresses + '\'' +
                 ", message='" + message + '\'' +
+                ", attachments='" + attachments + '\'' +
                 ", status='" + status + '\'' +
                 ", createTime='" + createTime + '\'' +
                 ", updateTime='" + updateTime + '\'' +
