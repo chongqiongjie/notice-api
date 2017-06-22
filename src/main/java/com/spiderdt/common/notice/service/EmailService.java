@@ -106,19 +106,27 @@ public class EmailService {
      * @return
      */
     public Boolean sendEmailBatch(List<NoticeTasksResultEntity> items){
+
+        long startTime;
+        long endTime;
         String sendTime = "";
         String backTime = "";
         int taskId;
         String detailInfo;
         String sendStatus;
 
-        for (NoticeTasksResultEntity item: items) {
+        startTime = System.currentTimeMillis();
+        int len = items.size();
+        // 使用 MimeMessage[] 更加高效
+        MimeMessage[] mimeMessagesList = new MimeMessage[len];
+        for (int i = 0; i < len; i++) {
+            NoticeTasksResultEntity item = items.get(i);
             taskId = item.getTaskId();
             noticeTaskService.updateNoticeTaskSatus(taskId, AppConstants.TASK_STATUS_SENDING);
             try {
                 sendTime = Jdate.getNowStrTime();
-                MimeMessage mimeMsg = sender.createMimeMessage();
-                MimeMessageHelper helper = new MimeMessageHelper(mimeMsg, true, "utf-8");
+                mimeMessagesList[i] = sender.createMimeMessage();
+                MimeMessageHelper helper = new MimeMessageHelper(mimeMessagesList[i], true, "utf-8");
 
                 setEmailBasicInfo(item.getAddress(), item.getSubject(), item.getMessage(), helper);
 
@@ -132,7 +140,6 @@ public class EmailService {
                     JSONArray jsonArray = JSON.parseArray(attachmentJsonString);
                     for (Object jsonObject : jsonArray) {
                         Map<String, String> attachmentAttributeMap = (Map<String, String>) jsonObject;
-                        String downloadUrl = attachmentAttributeMap.get("downloadUrl");
                         String fileName = attachmentAttributeMap.get("fileName");
                         String singleFilePath =  taskFileDir + "/" + fileName;
                         paths.add(singleFilePath);
@@ -140,7 +147,7 @@ public class EmailService {
                     }
                     setAttachments(paths, helper);
                 }
-                sender.send(mimeMsg);
+                sender.send(mimeMessagesList[i]);
                 // task 最后一个邮件发送
                 if(item.isLast()){
                     fileService.deleteDirectory(taskFileDir);
@@ -159,6 +166,10 @@ public class EmailService {
             Jlog.info("update notice_tacks_result_info backTime status riid :" + item.getRiid());
             tasksResultDao.updateNoticeTaskBackInfoStatus(item.getRiid(), sendStatus, detailInfo, sendTime, backTime);
         }
+
+        endTime = System.currentTimeMillis();
+        System.out.println("发送一批邮件花费时间： " + (endTime - startTime) + " ms");
+
         return true;
     }
 
