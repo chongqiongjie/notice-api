@@ -61,7 +61,11 @@ public class NoticeTaskService {
      * 通过间隔的扫描数据库状态，获取任务,发送短息/email
      */
     public void sendNoticeTaskByDbScan() throws AppException {
-        List<NoticeTasksResultEntity> task_list = tasksResultDao.getNewNoticeTaskResultsBatch(AppConstants.TASK_STATUS_NEW);
+        List<NoticeTasksResultEntity> task_list_new = tasksResultDao.getNewNoticeTaskResultsBatch(AppConstants.TASK_RESULT_STATUS_NEW);
+        List<NoticeTasksResultEntity> task_list_failed = tasksResultDao.getNewNoticeTaskResultsBatch(AppConstants.TASK_RESULT_STATUS_AUTH_FAILED);
+        List<NoticeTasksResultEntity> task_list = new ArrayList<>();
+        task_list.addAll(task_list_new);
+        task_list.addAll(task_list_failed);
         Jlog.info("get task list from db, count:"+task_list.size());
         if(task_list.size() > 0){
             List<NoticeTasksResultEntity> sms_task_list = Lists.newArrayList();
@@ -152,7 +156,7 @@ public class NoticeTaskService {
 //        String ret = "[{\"name\":\"qiong\",\"address\":\"18217168545\"}]";
 //        String ret = "[{\"name\":\"test\",\"address\":\"13458555648\"}]";
 //        String ret = "[{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"}]";
-        String ret = "[{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"}, {\"name\":\"test2\",\"address\":\"13458555648@163.com\"}]";
+        String ret = "[{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"}]";
         return ret;
 
     }

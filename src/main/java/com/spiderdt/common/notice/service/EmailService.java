@@ -17,6 +17,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 import javax.mail.MessagingException;
+import javax.mail.internet.AddressException;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeUtility;
 import java.io.File;
@@ -159,22 +160,29 @@ public class EmailService {
                 }
                 detailInfo = "success";
                 sendStatus = AppConstants.TASK_RESULT_STATUS_SUCCESS;
-            } catch (Exception ee) {
+            } catch (AddressException e) {
                 Jlog.error("send emailAddress:"+item.getAddress());
-                Jlog.error("send email error:"+ee.getMessage());
-                detailInfo = ee.getMessage();
+                Jlog.error("send email error:"+e.getMessage());
+                detailInfo = e.getMessage();
+                sendStatus = AppConstants.TASK_RESULT_STATUS_FAILED;
+
+            } catch (MessagingException e) {
+                // 登录异常会再次选出来发送
+                Jlog.error("send emailAddress:"+item.getAddress());
+                Jlog.error("send email error:"+e.getMessage());
+                detailInfo = e.getMessage();
+                sendStatus = AppConstants.TASK_RESULT_STATUS_AUTH_FAILED;
+
+            } catch (Exception e) {
+                Jlog.error("send emailAddress:"+item.getAddress());
+                Jlog.error("send email error:"+e.getMessage());
+                detailInfo = e.getMessage();
                 sendStatus = AppConstants.TASK_RESULT_STATUS_FAILED;
             }
             backTime = Jdate.getNowStrTime();
             Jlog.info("update notice_tacks_result_info backTime status riid :" + item.getRiid());
             tasksResultDao.updateNoticeTaskBackInfoStatus(item.getRiid(), sendStatus, detailInfo, sendTime, backTime);
 
-            // 20s 发送延时，防止被放入垃圾邮箱或者被封 TODO 考虑更好的方式
-            try {
-                Thread.sleep(20000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
         }
 
         endTime = System.currentTimeMillis();
