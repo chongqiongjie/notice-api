@@ -152,9 +152,10 @@ public class EmailService {
                     setAttachments(paths, helper);
                 }
                 sender.send(mimeMessagesList[i]);
-                // task 最后一个邮件发送
+                // task 最后一个邮件发送 考虑从数据库查
                 if(item.isLast()){
-                    fileService.deleteDirectory(taskFileDir);
+                    // 不删
+                    // fileService.deleteDirectory(taskFileDir);
                     Jlog.info("is last so delete task attachment dirctory!");
                     noticeTaskService.updateNoticeTaskSatus(taskId, AppConstants.TASK_STATUS_SENDED);
                 }
