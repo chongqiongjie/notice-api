@@ -13,7 +13,7 @@ import java.util.List;
  * Created by qiong on 2017/6/13.
  */
 @Repository
-public interface UpdateSmsTemplateDao {
+public interface ManageTemplateDao {
     /**
      * 删除模板时将is_vaild设为0
      * @param tid

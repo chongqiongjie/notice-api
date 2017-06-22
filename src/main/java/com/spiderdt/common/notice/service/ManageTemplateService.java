@@ -1,25 +1,20 @@
 package com.spiderdt.common.notice.service;
 
 
-import com.spiderdt.common.notice.dao.UpdateSmsTemplateDao;
+import com.spiderdt.common.notice.dao.ManageTemplateDao;
 import com.spiderdt.common.notice.entity.SmsTemplateEntity;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.beans.Transient;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by qiong on 2017/6/13.
  */
 @Service("UpdateSmsService")
-public class UpdateSmsService {
+public class ManageTemplateService {
     @Resource
-    UpdateSmsTemplateDao updateSmsTemplateDao;
+    ManageTemplateDao updateSmsTemplateDao;
 
 
     /**
