@@ -44,10 +44,12 @@ public class EmailService {
     @Autowired
     FileService fileService;
 
-    @Value("${attachment.storePath}") String attachmentStorePath;
+    @Value("${attachment.storePath}")
+    String attachmentStorePath;
 
     /**
      * 设置发送邮件的基本信息, 包括地址，主题，内容
+     *
      * @param desEmailAddr
      * @param subject
      * @param content
@@ -55,7 +57,7 @@ public class EmailService {
      */
     public void setEmailBasicInfo(String desEmailAddr, String subject, String content, MimeMessageHelper helper) {
         try {
-            helper.setText(content,true);
+            helper.setText(content, true);
             helper.setTo(desEmailAddr);
             helper.setSubject(subject);
             helper.setFrom(sender.getUsername());
@@ -67,18 +69,18 @@ public class EmailService {
     }
 
 
-
     /**
      * 设置发送多个附件的邮件
-     * @param paths 多个附件 path 的集合
+     *
+     * @param paths  多个附件 path 的集合
      * @param helper
      */
     public void setAttachments(ArrayList<String> paths, MimeMessageHelper helper) {
         try {
             // 添加附件
-            for (String path:paths) {
+            for (String path : paths) {
                 File file = new File(path);
-                while(!file.exists()) {
+                while (!file.exists()) {
                     // 睡 3s 等待下载文件
                     Thread.sleep(3000);
                 }
@@ -102,10 +104,11 @@ public class EmailService {
 
     /**
      * 批量发送邮件, 并且更新 notice_tasks_result_info 表 和 notice_tacks 表
+     *
      * @param items
      * @return
      */
-    public Boolean sendEmailBatch(List<NoticeTasksResultEntity> items){
+    public Boolean sendEmailBatch(List<NoticeTasksResultEntity> items) {
 
         long startTime;
         long endTime;
@@ -165,6 +168,13 @@ public class EmailService {
             backTime = Jdate.getNowStrTime();
             Jlog.info("update notice_tacks_result_info backTime status riid :" + item.getRiid());
             tasksResultDao.updateNoticeTaskBackInfoStatus(item.getRiid(), sendStatus, detailInfo, sendTime, backTime);
+
+            // 20s 发送延时，防止被放入垃圾邮箱或者被封 TODO 考虑更好的方式
+            try {
+                Thread.sleep(20000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
 
         endTime = System.currentTimeMillis();
