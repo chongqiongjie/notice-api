@@ -150,8 +150,9 @@ public class NoticeTaskService {
 
         Jlog.info("getAddressesFromJobId job_id:" + job_id);
 //        String ret = "[{\"name\":\"qiong\",\"address\":\"18217168545\"}]";
-        String ret = "[{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"}]";
-//        String ret = "[{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"}, {\"name\":\"test2\",\"address\":\"13458555648@163.com\"}]";
+//        String ret = "[{\"name\":\"test\",\"address\":\"13458555648\"}]";
+//        String ret = "[{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"}]";
+        String ret = "[{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"}, {\"name\":\"test2\",\"address\":\"13458555648@163.com\"}]";
         return ret;
 
     }
@@ -426,6 +427,7 @@ public class NoticeTaskService {
                     end = lsize;
                 }
                 List<TrackRecodeEntity> patch = lists.subList(i * isize, end);
+                Jlog.info("----------------------------- patch:" + patch);
                 trackRecodeDao.addTrackRecodeInfoBatch(patch);
             }
         }catch (Exception ee){
