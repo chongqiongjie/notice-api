@@ -2,6 +2,7 @@ package com.spiderdt.common.notice.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.spiderdt.common.notice.common.AppConstants;
 import com.spiderdt.common.notice.common.Jdate;
 import com.spiderdt.common.notice.common.Jlog;
 import com.spiderdt.common.notice.dao.TasksResultDao;
@@ -113,7 +114,7 @@ public class EmailService {
 
         for (NoticeTasksResultEntity item: items) {
             taskId = item.getTaskId();
-            noticeTaskService.updateNoticeTaskSatus(taskId, "sending");
+            noticeTaskService.updateNoticeTaskSatus(taskId, AppConstants.TASK_STATUS_SENDING);
             try {
                 sendTime = Jdate.getNowStrTime();
                 MimeMessage mimeMsg = sender.createMimeMessage();
@@ -140,18 +141,19 @@ public class EmailService {
                     setAttachments(paths, helper);
                 }
                 sender.send(mimeMsg);
+                // task 最后一个邮件发送
                 if(item.isLast()){
                     fileService.deleteDirectory(taskFileDir);
                     Jlog.info("is last so delete task attachment dirctory!");
-                    noticeTaskService.updateNoticeTaskSatus(taskId, "sended");
+                    noticeTaskService.updateNoticeTaskSatus(taskId, AppConstants.TASK_STATUS_SENDED);
                 }
                 detailInfo = "success";
-                sendStatus = "success";
+                sendStatus = AppConstants.TASK_RESULT_STATUS_SUCCESS;
             } catch (Exception ee) {
                 Jlog.error("send emailAddress:"+item.getAddress());
                 Jlog.error("send email error:"+ee.getMessage());
                 detailInfo = ee.getMessage();
-                sendStatus = "failed";
+                sendStatus = AppConstants.TASK_RESULT_STATUS_FAILED;
             }
             backTime = Jdate.getNowStrTime();
             Jlog.info("update notice_tacks_result_info backTime status riid :" + item.getRiid());
