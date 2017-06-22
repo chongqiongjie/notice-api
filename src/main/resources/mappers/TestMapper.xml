@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.spiderdt.common.notice.dao.TestDao">
+
+	<select id="getSummaryByTaskId" resultType="com.spiderdt.common.notice.entity.TestEntity">
+		SELECT task_id, notice_count, sent_count, view_count, click_count FROM notice.notice_tasks_summary WHERE task_id = #{taskId};
+	</select>
+
+</mapper>
