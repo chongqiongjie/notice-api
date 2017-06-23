@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.spiderdt.common.notice.dao.UpdateSmsTemplateDao">
+<mapper namespace="com.spiderdt.common.notice.dao.ManageTemplateDao">
 
     <resultMap id="ResultMap" type="com.spiderdt.common.notice.entity.SmsTemplateEntity">
 </resultMap>
@@ -12,9 +12,9 @@
     insert into notice.notice_message_template
     (temp_name,message_type,temp_type,user_id,template_subject,template_content,create_time,update_time,is_valid)
     values
-        (#{smsTemplateEntity.temp_name},#{smsTemplateEntity.message_type},#{smsTemplateEntity.temp_type},
-        #{smsTemplateEntity.user_id},#{smsTemplateEntity.template_subject},#{smsTemplateEntity.template_content},
-        now(),#{smsTemplateEntity.update_time} ,1)
+        (#{smsTemplateEntity.tempName},#{smsTemplateEntity.messageType},#{smsTemplateEntity.tempType},
+        #{smsTemplateEntity.userId},#{smsTemplateEntity.templateSubject},#{smsTemplateEntity.templateContent},
+        now(),#{smsTemplateEntity.updateTime} ,1)
 </insert>
 
 
