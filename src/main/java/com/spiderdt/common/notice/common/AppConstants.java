@@ -12,6 +12,7 @@ public class AppConstants {
     public static final int APP_ERROR_CODE = 5055;
 
     public static final String TASK_STATUS_NEW = "new";
+    public static final String TASK_STATUS_INIT = "init";
     public static final String TASK_STATUS_SENDING = "sending";
     public static final String TASK_STATUS_SENDED = "sended";
     public static final String TASK_RESULT_STATUS_NEW = "new";

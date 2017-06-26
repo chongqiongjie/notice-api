@@ -12,7 +12,7 @@ import java.util.List;
 @Repository
 public interface TasksResultDao {
 
-    public void createNoticeTaskResultBatch(List<NoticeTasksResultEntity> noticeTasksEntitys);
+    public Boolean createNoticeTaskResultBatch(List<NoticeTasksResultEntity> noticeTasksEntitys);
 
     /**
      * 获取结果数据表中状态为new的结果。

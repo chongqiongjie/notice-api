@@ -21,7 +21,7 @@ import javax.ws.rs.core.Response;
 @Produces({ MediaType.APPLICATION_JSON })
 public class CheckHealth {
     private static Logger log = LoggerFactory.getLogger(CheckHealth.class);
-    @Value("#{appProperties['redis.prefix']}")
+    @Value("#{config['redis.prefix']}")
     public String name ;
     @GET
     public Response ping(){

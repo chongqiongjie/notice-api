@@ -307,6 +307,7 @@
         <!-- 配置线上线下资源 -->
         <filters>
             <filter>src/main/resources/filters/${profiles.active}/app.properties</filter>
+            <filter>src/main/resources/filters/common.properties</filter>
         </filters>
         <resources>
             <resource>
