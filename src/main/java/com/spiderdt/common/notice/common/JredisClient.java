@@ -15,7 +15,7 @@ import java.util.Map;
  */
 public class JredisClient {
     //添加不同的头部，区分不同的生产线的key
-    @Value("#{appProperties['redis.prefix']}")
+    @Value("#{config['redis.prefix']}")
     public static String prefix="notice_api";
 
 

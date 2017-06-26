@@ -23,7 +23,7 @@
     <context:annotation-config />    
     <!-- 配置要扫描的包 -->    
     <context:component-scan base-package="com.spiderdt.common"></context:component-scan>
-    <bean id="appProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+    <bean id="config" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
         <property name="locations">
             <list>
                 <value>classpath:filters/common.properties</value>
@@ -32,7 +32,7 @@
         </property>
     </bean>
     <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PreferencesPlaceholderConfigurer">
-        <property name="properties" ref="appProperties" />
+        <property name="properties" ref="config" />
     </bean>
     <bean id="slog" class="com.spiderdt.common.notice.common.Slog" > </bean>
     <bean id="sredis" class="com.spiderdt.common.notice.common.Sredis" >
@@ -41,6 +41,7 @@
         <constructor-arg name="timeout" value ="${redis.timeout}"/>
         <constructor-arg name="prefix" value ="${redis.prefix}"/>
     </bean>
+    <!--
 
     <mvc:interceptors>
         <mvc:interceptor>
@@ -48,5 +49,6 @@
             <bean class="com.spiderdt.common.notice.interceptors.Interceptors" />
         </mvc:interceptor>
     </mvc:interceptors>
+    -->
   
 </beans> 

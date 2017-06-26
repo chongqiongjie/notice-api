@@ -36,7 +36,7 @@ public class NoticeTasksEntity implements Serializable {
         this.attachments = input.getAttachments();
         this.subject = input.getSubject();
         this.message = input.getMessage();
-        this.status = AppConstants.TASK_STATUS_NEW;
+        this.status = AppConstants.TASK_STATUS_INIT;        //job init
         this.createTime = Jdate.getNowStrTime();
         this.updateTime = Jdate.getNowStrTime();
     }

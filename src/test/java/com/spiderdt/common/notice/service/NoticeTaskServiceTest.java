@@ -1,6 +1,7 @@
 package com.spiderdt.common.notice.service;
 
 import com.spiderdt.common.notice.entity.NoticeTasksEntity;
+import com.spiderdt.common.notice.errorhander.AppException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -116,5 +117,20 @@ public class NoticeTaskServiceTest {
 //        System.out.println(noticeTaskService.getAttachmentByTaskId(31));
 //        System.out.println(noticeTaskService.getAttachmentByTaskId(32));
 //        System.out.println(noticeTaskService.getAttachmentByTaskId(33));
+    }
+
+    @Test
+    public void testCreateSmsTask() throws AppException {
+        NoticeTasksEntity noticeTasksEntity = new NoticeTasksEntity();
+        noticeTasksEntity.setTaskType("sms");
+        noticeTasksEntity.setClientId("jupiter");
+        noticeTasksEntity.setUserId("test");
+        noticeTasksEntity.setJobId("job_test_id");
+        noticeTasksEntity.setTemplateId(1);
+        noticeTasksEntity.setMessage("#name# 您好，http://baidu.com 还有 http://z.cn ");
+        //如果task_type==sms时
+        //noticeTasksEntity.setSubject("#name# 专属");
+        //noticeTasksEntity.setAttachments("http://xxxxxxx");
+        noticeTaskService.createNoticeTask(noticeTasksEntity);
     }
 }
