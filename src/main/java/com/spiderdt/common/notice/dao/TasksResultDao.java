@@ -49,4 +49,13 @@ public interface TasksResultDao {
                                                    @Param("send_time") String send_time,
                                                    @Param("back_time") String back_time);
 
+    /**
+     * 通过 taskId统计没有发送或登录失败的个数
+     * @param taskId
+     * @param newStatus
+     * @param authFailedStatus
+     * @return
+     */
+    public int countUnfixedResultByTaskId(@Param("taskId") int taskId, @Param("newStatus") String newStatus, @Param("authFailedStatus") String authFailedStatus);
+
 }

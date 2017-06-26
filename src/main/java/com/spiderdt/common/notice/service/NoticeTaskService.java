@@ -77,9 +77,9 @@ public class NoticeTaskService {
                     email_task_list.add(item);
                 }
             }
-            Boolean sms_st = smsService.sendSmsBatch(sms_task_list);
+//            Boolean sms_st = smsService.sendSmsBatch(sms_task_list);
             Boolean email_st = emailService.sendEmailBatch(email_task_list);
-            Jlog.info("send notice end:sms:"+sms_st+" email:"+email_st);
+//            Jlog.info("send notice end:sms:"+sms_st+" email:"+email_st);
         }
     }
     /**
@@ -153,12 +153,11 @@ public class NoticeTaskService {
     public String getAddressesFromJobId(String job_id){
 
         Jlog.info("getAddressesFromJobId job_id:" + job_id);
-        String ret = "[{\"name\":\"qiong\",\"address\":\"18217168545\"}]";
+//        String ret = "[{\"name\":\"qiong\",\"address\":\"18217168545\"}]";
 //        String ret = "[{\"name\":\"test\",\"address\":\"13458555648\"}]";
 //        String ret = "[{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"}]";
-//        String ret = "[{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"}]";
-       // String ret = "[{\"name\":\"test\",\"address\":\"chong.qiongjie@spiderdt.com\"}]";
-//        String ret = "[{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"}, {\"name\":\"test2\",\"address\":\"13458555648@163.com\"}]";
+        String ret = "[{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"}]";
+//        String ret = "[{\"name\":\"test\",\"address\":\"chong.qiongjie@spiderdt.com\"}]";
         return ret;
 
     }
@@ -337,16 +336,10 @@ public class NoticeTaskService {
         List<NoticeTasksResultEntity> resultInfoList =  Lists.newArrayList();
         List<TrackRecodeEntity> all_trackRecodeEntities = Lists.newArrayList();
         int sizeOfAddressMapList = addresses_map_list.size();
-        int i = 1;
-        boolean isLast = false;
         for(Map<String,String> address_map:addresses_map_list){
 
             NoticeTasksResultEntity item = new NoticeTasksResultEntity();
             String address = address_map.get(this.json_address_key);
-            if(i == addresses_map_list.size()) {
-                Jlog.info("task last addree:" + address);
-                isLast = true;
-            }
             String message = noticeTasksEntity.getMessage();
             String subject = noticeTasksEntity.getSubject();
             for(Map.Entry<String,String> entry : address_map.entrySet()){
@@ -361,7 +354,6 @@ public class NoticeTaskService {
             //trick
             item.setTaskType(noticeTasksEntity.getTaskType());      //主要用于后续流程区分
             item.setAddress(address);
-            item.setLast(isLast);
             item.setMessage(message);       //设置替换URL之前的message。用于传递参数给后面流程,后面会用替换trackurl后的message覆盖。
             item.setSubject(subject);       //如果是sms,可以不用设置。
             item.setSendStatus(AppConstants.TASK_RESULT_STATUS_NEW);
@@ -378,7 +370,6 @@ public class NoticeTaskService {
                 trackRecodeEntity.setMessageReplace(item.getMessage());
                 all_trackRecodeEntities.add(trackRecodeEntity);
             }
-            i += 1;
         }
         slog.debug("get NoticeTasksResultEntity:"+resultInfoList);
         try {
@@ -475,5 +466,15 @@ public class NoticeTaskService {
     public NoticeTasksEntity getAttachmentByTaskId(int taskId) {
         return noticeTasksDao.getAttachmentByTaskId(taskId);
     };
+
+    /**
+     * 通过 taskId统计没有发送或登录失败的个数
+     * @return
+     */
+    public int countUnfixedResultByTaskId(int taskId) {
+        int count = tasksResultDao.countUnfixedResultByTaskId(taskId, AppConstants.TASK_STATUS_NEW, AppConstants.TASK_RESULT_STATUS_AUTH_FAILED);
+        return count;
+    }
+
 
 }
