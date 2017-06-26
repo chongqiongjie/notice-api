@@ -213,7 +213,10 @@ public class Utils {
      */
     public static HashMap<Integer, String> getUrlsFromMessage(String message,String type){
         Pattern patternHttp = null;
-        if(type == null || type.equals("email") == true) {
+        Jlog.info("getUrlsFromMessage message:" + message);
+        Jlog.info("getUrlsFromMessage type:" + type);
+        if(type == null || type.equals("email")) {
+            Jlog.info("type eamil Pattern");
             patternHttp = Pattern.compile("<a.*?href=[\"']?((https?://)?/?[^\"']+)[\"']?.*?>(.+)</a>");
         }else{
             patternHttp = Pattern.compile("(?<!\\d)(?:(?:[\\w[.-://]]*\\.[com|cn|net|tv|gov|org|biz|cc|uk|jp|edu]+[^\\s|^\\u4e00-\\u9fa5]*))");
@@ -223,7 +226,7 @@ public class Utils {
         int i = 0;
         while(matcher.find()) {
             String link = "";
-            if(type == null || type.equals("email") == true) {
+            if(type == null || type.equals("email")) {
                 link = matcher.group(1).trim();
             }else{
                 link = matcher.group().trim();
@@ -235,26 +238,10 @@ public class Utils {
         return linkOrderMap;
     }
 
-    /**
-     * 对文本中的第一个URL，使用新的URL进行替换
-     * att.如果有多个URL，会出现一些不可预知的问题
-     * @param message
-     * @param new_url
-     * @return
-     */
-//    public static String replaceUrlFromMessage(String message,String new_url){
-//        Pattern pb = Pattern.compile("(?<!\\d)(?:(?:[\\w[.-://]]*\\.[com|cn|net|tv|gov|org|biz|cc|uk|jp|edu]+[^\\s|^\\u4e00-\\u9fa5]*))");
-//        String re_message = message;
-//        Matcher mb = pb.matcher(message);
-//        if (mb.find()) {
-//            Jlog.info("replace url:" + mb.group()+" new url:"+new_url);
-//            re_message = mb.replaceAll(new_url);
-//        }
-//        return re_message;
-//    }
+
 
     /**
-     * 替换 a 标签链接
+     * 替换链接
      * @param message
      * @param old_url
      * @param new_url

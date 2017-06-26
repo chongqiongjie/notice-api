@@ -304,7 +304,6 @@ public class NoticeTaskService {
         if(task_type.equals(AppConstants.SMS_TASK_TYPE) == true){
             short_url = urlService.makeShortUrl(track_url);
         }else if (task_type.equals(AppConstants.EMAIL_TASK_TYPE) == true){
-//            short_url = "<a target=_blank href=\""+track_url+"\">"+org_url+"</a>";
             short_url = track_url;
         }
         message = Utils.replaceUrlFromMessage(message,org_url,short_url);

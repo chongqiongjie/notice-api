@@ -121,11 +121,12 @@ public class UtilsTest {
                 "<a href=\"https://www.google.com#/bai\">3</a>" +
                 "<img src=\"http://blog.csdn.net/yaerfeng/article/details/18402569\">\n"+
                 "</html>";
-
-//        HashMap<Integer, String> urls = utils.getUrlsFromMessage(html);
-//        for (Map.Entry<Integer, String> entry : urls.entrySet()) {
-//            System.out.println("Key = " + entry.getKey() + ", Value = "  + entry.getValue());
-//        }
+//        html = "this <a href='http://www.baidu.com'>3</a>is email message";
+        String taskType = "email";
+        HashMap<Integer, String> urls = Utils.getUrlsFromMessage(html, taskType);
+        for (Map.Entry<Integer, String> entry : urls.entrySet()) {
+            System.out.println("Key = " + entry.getKey() + ", Value = "  + entry.getValue());
+        }
 
     }
 
