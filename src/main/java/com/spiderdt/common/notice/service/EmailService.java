@@ -118,7 +118,7 @@ public class EmailService {
         int taskId;
         String detailInfo;
         String sendStatus;
-
+        String taskFileDir = null;
         startTime = System.currentTimeMillis();
         int len = items.size();
         // 使用 MimeMessage[] 更加高效
@@ -136,7 +136,7 @@ public class EmailService {
 
                 NoticeTasksEntity tasksEntity = noticeTaskService.getAttachmentByTaskId(taskId);
                 String attachmentJsonString = tasksEntity.getAttachments();
-                String taskFileDir = attachmentStorePath + "/" + taskId;
+                taskFileDir = attachmentStorePath + "/" + taskId;
                 // path list 中可能有一个值，但是为 ""
                 if (!"".equals(attachmentJsonString)) {
                     ArrayList<String> paths = new ArrayList<>();
@@ -152,13 +152,7 @@ public class EmailService {
                     setAttachments(paths, helper);
                 }
                 sender.send(mimeMessagesList[i]);
-                // task 最后一个邮件发送 考虑从数据库查
-                if(item.isLast()){
-                    // 不删
-                    // fileService.deleteDirectory(taskFileDir);
-                    Jlog.info("is last so delete task attachment dirctory!");
-                    noticeTaskService.updateNoticeTaskSatus(taskId, AppConstants.TASK_STATUS_SENDED);
-                }
+
                 detailInfo = "success";
                 sendStatus = AppConstants.TASK_RESULT_STATUS_SUCCESS;
             } catch (AddressException e) {
@@ -167,23 +161,25 @@ public class EmailService {
                 detailInfo = e.getMessage();
                 sendStatus = AppConstants.TASK_RESULT_STATUS_FAILED;
 
-            } catch (MessagingException e) {
+            } catch (Exception e) {
                 // 登录异常会再次选出来发送
                 Jlog.error("send emailAddress:"+item.getAddress());
                 Jlog.error("send email error:"+e.getMessage());
                 detailInfo = e.getMessage();
                 sendStatus = AppConstants.TASK_RESULT_STATUS_AUTH_FAILED;
 
-            } catch (Exception e) {
-                Jlog.error("send emailAddress:"+item.getAddress());
-                Jlog.error("send email error:"+e.getMessage());
-                detailInfo = e.getMessage();
-                sendStatus = AppConstants.TASK_RESULT_STATUS_FAILED;
             }
             backTime = Jdate.getNowStrTime();
             Jlog.info("update notice_tacks_result_info backTime status riid :" + item.getRiid());
             tasksResultDao.updateNoticeTaskBackInfoStatus(item.getRiid(), sendStatus, detailInfo, sendTime, backTime);
 
+            int count = noticeTaskService.countUnfixedResultByTaskId(taskId);
+            // task 最后一个邮件发送 考虑从数据库查
+            if(count == 0){
+                fileService.deleteDirectory(taskFileDir);
+                Jlog.info("is last so delete task attachment dirctory!");
+                noticeTaskService.updateNoticeTaskSatus(taskId, AppConstants.TASK_STATUS_SENDED);
+            }
         }
 
         endTime = System.currentTimeMillis();
