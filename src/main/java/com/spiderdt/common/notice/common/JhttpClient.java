@@ -57,6 +57,7 @@ public class JhttpClient {
         return jsonResult;
     }
     public static JSONObject httpGet(String url){
+        System.out.println("[[[[[[[[[[["+url);
         JSONObject jsonResult = null;
         try {
             DefaultHttpClient client = new DefaultHttpClient();

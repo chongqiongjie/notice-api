@@ -11,10 +11,10 @@ import java.util.List;
 /**
  * Created by qiong on 2017/6/13.
  */
-@Service("UpdateSmsService")
+@Service("ManageTemplateDao")
 public class ManageTemplateService {
     @Resource
-    ManageTemplateDao updateSmsTemplateDao;
+    ManageTemplateDao manageTemplateDao;
 
 
     /**
@@ -22,8 +22,8 @@ public class ManageTemplateService {
      */
     //@Transactional(propagation = Propagation.REQUIRED)
     public  boolean insertSmsTemplate(SmsTemplateEntity template){
-            //Boolean valid = updateSmsTemplateDao.updateValid(template.getMessage_type(),template.getUser_id());
-            Boolean temp = updateSmsTemplateDao.insertSmsTemplate(template);
+            //Boolean valid = manageTemplateDao.updateValid(template.getMessage_type(),template.getUser_id());
+            Boolean temp = manageTemplateDao.insertSmsTemplate(template);
             return temp;
            // return valid;
     }
@@ -33,7 +33,7 @@ public class ManageTemplateService {
      * @param tid
      */
         public boolean deleteSmsTemplate(Integer tid){
-            boolean status = updateSmsTemplateDao.updateValid(tid);
+            boolean status = manageTemplateDao.updateValid(tid);
             return status;
         }
 //
@@ -41,13 +41,13 @@ public class ManageTemplateService {
      * 通过id更新短信文本
      */
      public boolean updateSmsTemplate(Integer id,String template_content){
-         return updateSmsTemplateDao.updateSmsTemplate(id,template_content);
+         return manageTemplateDao.updateSmsTemplate(id,template_content);
      }
 
     /**
      *通过id查询短信模板
      */
     public List<SmsTemplateEntity> getSmsTemplate(String message_type,String user_id){
-        return updateSmsTemplateDao.getSmsTemplate(message_type,user_id);
+        return manageTemplateDao.getSmsTemplate(message_type,user_id);
     }
 }

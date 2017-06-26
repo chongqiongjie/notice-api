@@ -20,6 +20,8 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.*;
 
+import static com.spiderdt.common.notice.common.JhttpClient.httpGet;
+
 /**
  * Created by fivebit on 2017/6/5.
  */
@@ -155,18 +157,20 @@ public class NoticeTaskService {
      */
     public String getAddressesFromJobId(String job_id){
 
+//        Jlog.info("getAddressesFromJobId job_id:" + job_id);
+////        String ret = "[{\"name\":\"qiong\",\"address\":\"18217168545\"}]";
+////        String ret = "[{\"name\":\"test\",\"address\":\"13458555648\"}]";
+////        String ret = "[{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"}]";
+//       // String ret = "[{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"}]";
+//        String ret = "[{\"name\":\"test\",\"address\":\"chong.qiongjie@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"}]";
+////        String ret = "[{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"}, {\"name\":\"test2\",\"address\":\"13458555648@163.com\"}]";
+//        return ret;
+         String clientUrl = "http://192.168.1.2:8095/";
+         String url = clientUrl + "jupiter-v1/jupiter/client_info/" + job_id + "?data_source=latetime" ;
 
-        Jlog.info("getAddressesFromJobId job_id:" + job_id);
-//        String ret = "[{\"name\":\"qiong\",\"address\":\"18217168545\"}]";
+        JSONObject http = httpGet(url);
 
-        slog.debug("getAddressesFromJobId job_id:" + job_id);
-        String ret = "[{\"name\":\"qiong\",\"address\":\"18217168545\"}]";
-
-//        String ret = "[{\"name\":\"test\",\"address\":\"13458555648\"}]";
-//        String ret = "[{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"}]";
-//        String ret = "[{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"}]";
-//        String ret = "[{\"name\":\"test\",\"address\":\"chong.qiongjie@spiderdt.com\"}]";
-        return ret;
+        return http.toString();
 
     }
 

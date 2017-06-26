@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import org.apache.commons.codec.binary.Hex;
 import org.springframework.stereotype.Service;
 import sun.misc.BASE64Decoder;
+import sun.misc.BASE64Encoder;
 
 import javax.crypto.Mac;
 import javax.crypto.SecretKey;
@@ -38,11 +39,11 @@ public class CreateTokenService {
      * @throws Exception
      */
     public static String encryptBASE64(byte[] key) throws Exception {
-        //base64加密
-        //return (new BASE64Encoder()).encodeBuffer(key);
+//        //base64加密
+//        return (new BASE64Encoder()).encodeBuffer(key);
 
         //url安全的base64加密
-        return (Base64.getUrlEncoder().encodeToString(key));
+       return (Base64.getUrlEncoder().encodeToString(key));
     }
 
 
@@ -59,6 +60,7 @@ public class CreateTokenService {
         byte[] hexB = new Hex().encode(doFinal);
         String checksum = new String(hexB);
         return checksum;
+
     }
 
     public static String getToken(String base64_accessKey,String base64_hmac,String data){
@@ -66,37 +68,38 @@ public class CreateTokenService {
         return token;
     }
 
-
-    public static void main(String[] args) throws Exception {
-        String accessKey = "pKPgJj2BmU9Q5R7u";
-        Map<String, String> params = new HashMap();
-        String paramsString = JSON.toJSONString(params);
-        System.out.println(paramsString);
-
-        String data = CreateTokenService.encryptBASE64(paramsString.getBytes());
-        System.out.println("加密后的json：" + data);
-
-        String base64_accessKey = CreateTokenService.encryptBASE64(accessKey.getBytes());
-        System.out.println("base64_accessKey:" + base64_accessKey);
-
-
-
-        byte[] byteArray = CreateTokenService.decryptBASE64(data);
-        System.out.println("解密后：" + new String(byteArray));
-
-
-        String hmac = CreateTokenService.hmac(data);
-        System.out.println("hmac:" + hmac);
-
-        String base64_hmac = CreateTokenService.hmac(hmac);
-        System.out.println("base64_hmac:" + base64_hmac);
-
-//        String token = base64_accessKey + ":" + base64_hmac + ":" + data;
-//        //String token = base64_accessKey + base64_hmac + data;
+//
+//    public static void main(String[] args) throws Exception {
+//        String accessKey = "pKPgJj2BmU9Q5R7u";
+//        Map<String, String> params = new HashMap();
+//        String paramsString = JSON.toJSONString(params);
+//        //String paramsString = "{\"userId\":\"592e5728898b29dc3436b38f\",\"username\":\"spiderdt\",\"prefix\":\"/forum/oss\"}";
+//        System.out.println(paramsString);
+//
+//        String data = CreateTokenService.encryptBASE64(paramsString.getBytes());
+//        System.out.println("加密后的json：" + data);
+//
+//        String base64_accessKey = CreateTokenService.encryptBASE64(accessKey.getBytes());
+//        System.out.println("base64_accessKey:" + base64_accessKey);
+//
+//
+//
+////        byte[] byteArray = CreateTokenService.decryptBASE64(data);
+////        System.out.println("解密后：" + new String(byteArray));
+//
+//
+//        String hmac = CreateTokenService.hmac(data);
+//        System.out.println("hmac:" + hmac);
+//
+////        String base64_hmac = CreateTokenService.hmac(hmac);
+////        System.out.println("base64_hmac:" + base64_hmac);
+//        String base64_hmac = CreateTokenService.encryptBASE64(hmac.getBytes());
+//        System.out.println("base64_hmac:" + base64_hmac);
+//
+//
+//        String token = CreateTokenService.getToken(base64_accessKey,base64_hmac,data);
 //        System.out.println("token:" + token);
-        String token = CreateTokenService.getToken(base64_accessKey,base64_hmac,data);
-        System.out.println("token:" + token);
-    }
+//    }
 
 }
 

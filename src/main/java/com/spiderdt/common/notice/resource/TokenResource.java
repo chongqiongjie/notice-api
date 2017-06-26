@@ -31,20 +31,22 @@ public class TokenResource {
     @POST
     public Response token(Map<String,String> params){
 
-        String encodeStr = "";
+       // String encodeStr = "";
         String token = "";
         try {
             String accessKey = "pKPgJj2BmU9Q5R7u";
             String paramsString = JSON.toJSONString(params);
 
-
+            System.out.println("params_before:" + paramsString);
             String data = CreateTokenService.encryptBASE64(paramsString.getBytes());
+            System.out.println("params_after:" + data);
             String base64_accessKey = CreateTokenService.encryptBASE64(accessKey.getBytes());
             String hmac = CreateTokenService.hmac(data);
-           // System.out.println("hmac:" + hmac);
-            String base64_hmac = CreateTokenService.hmac(hmac);
-            //System.out.println("base64_hmac:" + base64_hmac);
+            System.out.println("hmac:" + hmac);
+            String base64_hmac = CreateTokenService.encryptBASE64(hmac.getBytes());
+            System.out.println("base64_hmac:" + base64_hmac);
              token = CreateTokenService.getToken(base64_accessKey,base64_hmac,data);
+            System.out.println("token:" + token);
         } catch (Exception e) {
             e.printStackTrace();
         }

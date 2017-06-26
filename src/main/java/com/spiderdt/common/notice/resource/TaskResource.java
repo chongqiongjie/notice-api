@@ -9,10 +9,7 @@ import com.spiderdt.common.notice.service.NoticeTaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -49,6 +46,19 @@ public class TaskResource {
         Boolean st = noticeTaskService.createNoticeTask(noticeTasksEntity);
         slog.info("create task end:st:"+st+" param:"+task_param.toString());
         return Response.status(Response.Status.CREATED)// 201
+                .entity(Utils.getRespons()).build();
+
+    }
+
+    /**
+     * 通过job_id获取用户名和address
+     */
+    @GET
+    @Consumes({ MediaType.APPLICATION_JSON })
+    public Response getAddressesFromJobId(String job_id) throws AppException {
+        String address = noticeTaskService.getAddressesFromJobId(job_id);
+        slog.info("getAddressesFromJobId:" + address);
+        return Response.status(Response.Status.CREATED)
                 .entity(Utils.getRespons()).build();
 
     }
