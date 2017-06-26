@@ -52,7 +52,6 @@ public class DefaultSmsSendTask implements  SmsRunTask{
     public void run() {
         Jlog.info("start  send sms task :"+task_id);
         SmsService smsService = (SmsService) ctx.getBean("smsService");
-        //smsService.updateNoticeTaskSatus(task_id,"sending");
         SmsReqEntity sendEntity = new SmsReqEntity();
         sendEntity.setPassword(password);
         sendEntity.setAccount(account);
@@ -70,7 +69,7 @@ public class DefaultSmsSendTask implements  SmsRunTask{
                     end = list_size;
                 }
                 List<SmsReqEntity.SmsMsgEntity> patch = smsMsgEntitys.subList(i * sms_batch, end);
-                Jlog.info("patch:"+patch);
+                Jlog.debug("patch:"+patch);
                 sendEntity.setData(patch);
                 JSONObject http_ret = JhttpClient.httpPost(sms_host_url,(JSONObject) JSON.toJSON(sendEntity));
                 Jlog.info("http post return:"+http_ret.toJSONString());

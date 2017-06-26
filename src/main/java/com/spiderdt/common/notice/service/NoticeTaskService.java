@@ -66,7 +66,9 @@ public class NoticeTaskService {
         List<NoticeTasksResultEntity> task_list = new ArrayList<>();
         task_list.addAll(task_list_new);
         task_list.addAll(task_list_failed);
-        Jlog.info("get task list from db, count:"+task_list.size());
+        slog.info("get task list from db, count:"+task_list.size());
+        Boolean sms_st = false;
+        Boolean email_st = false;
         if(task_list.size() > 0){
             List<NoticeTasksResultEntity> sms_task_list = Lists.newArrayList();
             List<NoticeTasksResultEntity> email_task_list = Lists.newArrayList();
@@ -77,10 +79,10 @@ public class NoticeTaskService {
                     email_task_list.add(item);
                 }
             }
-            Boolean sms_st = smsService.sendSmsBatch(sms_task_list);
-            Boolean email_st = emailService.sendEmailBatch(email_task_list);
-            Jlog.info("send notice end:sms:"+sms_st+" email:"+email_st);
+            sms_st = smsService.sendSmsBatch(sms_task_list);
+            email_st = emailService.sendEmailBatch(email_task_list);
         }
+        slog.info("send notice end:sms:"+sms_st+" email:"+email_st);
     }
     /**
      *  创建一个通知task。包括初始化result_info表。
@@ -152,7 +154,7 @@ public class NoticeTaskService {
      */
     public String getAddressesFromJobId(String job_id){
 
-        Jlog.info("getAddressesFromJobId job_id:" + job_id);
+        slog.debug("getAddressesFromJobId job_id:" + job_id);
         String ret = "[{\"name\":\"qiong\",\"address\":\"18217168545\"}]";
 //        String ret = "[{\"name\":\"test\",\"address\":\"13458555648\"}]";
 //        String ret = "[{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"}]";
@@ -439,7 +441,7 @@ public class NoticeTaskService {
                     end = lsize;
                 }
                 List<TrackRecodeEntity> patch = lists.subList(i * isize, end);
-                Jlog.info("----------------------------- patch:" + patch);
+                Jlog.debug("patch:" + patch);
                 trackRecodeDao.addTrackRecodeInfoBatch(patch);
             }
         }catch (Exception ee){

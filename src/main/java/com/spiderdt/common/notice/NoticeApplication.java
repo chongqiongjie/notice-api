@@ -17,18 +17,6 @@ public class NoticeApplication extends ResourceConfig {
 	 */
 	public NoticeApplication() {
         packages("com.spiderdt.common.notice");
-//		// register filters
-//		register(RequestContextFilter.class);
-//		register(LoggingResponseFilter.class);
-//		register(CORSResponseFilter.class);
-//
-//		// register exception mappers
-//		register(GenericExceptionMapper.class);
-//		register(AppExceptionMapper.class);
-//      register(CustomReasonPhraseExceptionMapper.class);
-//		register(NotFoundExceptionMapper.class);
-//
-		// register features
 		register(JacksonFeature.class);
 		register(EntityFilteringFeature.class);
 	}
