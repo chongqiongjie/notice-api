@@ -46,9 +46,11 @@ public class SmsResource {
 
     @POST
     @Path("/insert")
-    //@Consumes({ MediaType.APPLICATION_JSON })
+    @Consumes({ MediaType.APPLICATION_JSON })
     public Response insert(SmsTemplateEntity templateEntity){
+        System.out.println(templateEntity);
         boolean template =  manageTemplateService.insertSmsTemplate(templateEntity);
+        System.out.println(template);
         return  Response.ok().entity(Utils.getRespons("0",template)).build();
     }
 

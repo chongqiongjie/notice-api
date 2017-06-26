@@ -1,11 +1,17 @@
 package com.spiderdt.common.notice.service;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.spiderdt.common.notice.entity.NoticeTasksEntity;
+import com.spiderdt.common.notice.errorhander.AppException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.util.ArrayList;
+import java.util.Map;
 
 /**
  * @author ranran
@@ -61,8 +67,10 @@ public class NoticeTaskServiceTest {
         noticeTasksEntity.setMessage("#name# 您好 " + html);
         //如果task_type==sms时
         noticeTasksEntity.setSubject("#name# 专属");
-//        noticeTasksEntity.setAttachments("http://xxxxxxx");
+        noticeTasksEntity.setAttachments("[{\"fileName\":\"test.jpg\", \"downloadUrl\":\"http://www.qqleju.com/uploads/allimg/130618/18-110930_9.jpg\"}, {\"fileName\":\"test2.jpg\", \"downloadUrl\":\"http://www.qqleju.com/uploads/allimg/130618/18-110930_9.jpg\"}]");
+
         Boolean st = noticeTaskService.createNoticeTask(noticeTasksEntity);
+        System.out.println(st);
 
     }
 
@@ -72,6 +80,8 @@ public class NoticeTaskServiceTest {
 
     @Test
     public void getAddressesFromJobId() throws Exception {
+       String job_id = "latetime_feature2_20161101_20161115";
+        System.out.println(noticeTaskService.getAddressesFromJobId(job_id));
     }
 
     @Test
@@ -117,4 +127,7 @@ public class NoticeTaskServiceTest {
 //        System.out.println(noticeTaskService.getAttachmentByTaskId(32));
 //        System.out.println(noticeTaskService.getAttachmentByTaskId(33));
     }
+
+
+
 }

@@ -20,6 +20,8 @@
 
 
 
+
+
     <update id="updateValid">
         update notice.notice_message_template set is_valid = 0
         where  tid = #{tid}

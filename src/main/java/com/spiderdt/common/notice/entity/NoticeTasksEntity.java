@@ -26,6 +26,8 @@ public class NoticeTasksEntity implements Serializable {
     private String status ;
     private String createTime ;
     private String updateTime ;
+
+
     public void initByTaskInput(TaskInput input){
         this.parentTaskId = 0;
         this.taskType = input.getTask_type();
