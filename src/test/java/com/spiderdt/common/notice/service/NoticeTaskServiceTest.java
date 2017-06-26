@@ -1,5 +1,6 @@
 package com.spiderdt.common.notice.service;
 
+import com.spiderdt.common.notice.common.Jlog;
 import com.spiderdt.common.notice.entity.NoticeTasksEntity;
 import com.spiderdt.common.notice.errorhander.AppException;
 import org.junit.Test;
@@ -132,5 +133,17 @@ public class NoticeTaskServiceTest {
         //noticeTasksEntity.setSubject("#name# 专属");
         //noticeTasksEntity.setAttachments("http://xxxxxxx");
         noticeTaskService.createNoticeTask(noticeTasksEntity);
+    }
+
+
+    @Test
+    public void countUnfixedResultByTaskId() {
+        int count = noticeTaskService.countUnfixedResultByTaskId(108);
+        System.out.println(noticeTaskService.countUnfixedResultByTaskId(108));
+        if (count == 0) {
+            Jlog.info("is last so delete task attachment dirctory!");
+        }
+//        System.out.println(noticeTaskService.countUnfixedResultByTaskId(106));
+//        System.out.println(noticeTaskService.countUnfixedResultByTaskId(102));
     }
 }

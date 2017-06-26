@@ -6,9 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * @author ranran
  * @version V1.0
@@ -121,10 +118,10 @@ public class UtilsTest {
                 "<a href=\"https://www.google.com#/bai\">3</a>" +
                 "<img src=\"http://blog.csdn.net/yaerfeng/article/details/18402569\">\n"+
                 "</html>";
-        HashMap<Integer, String> urls = utils.getUrlsFromMessage(html);
-        for (Map.Entry<Integer, String> entry : urls.entrySet()) {
-            System.out.println("Key = " + entry.getKey() + ", Value = "  + entry.getValue());
-        }
+//        HashMap<Integer, String> urls = utils.getUrlsFromMessage(html);
+//        for (Map.Entry<Integer, String> entry : urls.entrySet()) {
+//            System.out.println("Key = " + entry.getKey() + ", Value = "  + entry.getValue());
+//        }
 
     }
 
