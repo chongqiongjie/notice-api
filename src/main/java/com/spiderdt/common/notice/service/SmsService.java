@@ -65,7 +65,6 @@ public class SmsService extends  NoticeTaskService {
 
     public List<SmsReqEntity.SmsMsgEntity> makeMsgEntitys(List<NoticeTasksResultEntity> items) throws AppException {
         JSONArray addes = null;
-        String reserve_key = "phone";
         List<SmsReqEntity.SmsMsgEntity> msgList = Lists.newArrayList();
         for(NoticeTasksResultEntity item: items){
             SmsReqEntity.SmsMsgEntity smsMsgEntity = new SmsReqEntity.SmsMsgEntity();
@@ -91,11 +90,11 @@ public class SmsService extends  NoticeTaskService {
      * @return
      */
     public Boolean sendMsgToHttpClient(List<SmsReqEntity.SmsMsgEntity> smsMsgEntitys){
-        Jlog.info("call  sms service begin");
+        Jlog.info("call sms service begin");
         SmsRunTask smsRunTask = new DefaultSmsSendTask();
         smsRunTask.setMsg(smsMsgEntitys);
         taskPool.execute(smsRunTask);
-        Jlog.info("call  sms service end");
+        Jlog.info("call sms service end");
         return true;
 
     }
