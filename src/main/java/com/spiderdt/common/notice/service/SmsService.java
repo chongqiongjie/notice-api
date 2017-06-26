@@ -107,17 +107,21 @@ public class SmsService extends  NoticeTaskService {
      *
      */
     public Boolean dealSmsResultStatus(List<SmsReqEntity.SmsMsgEntity> send_patch ,JSONObject http_rets){
-        Jlog.info("deal sms result:"+http_rets.toJSONString());
         Boolean st = true;
         SmsRespEntity smsRespEntity = JSONObject.toJavaObject(http_rets,SmsRespEntity.class);
+        Jlog.debug("deal sms result:"+http_rets.toJSONString() +" and:"+smsRespEntity.toString());
         String send_time = Jdate.getNowStrTime();
         try {
 
-            String status = AppConstants.SMS_SUBMIT_CODE_STATUS.get(smsRespEntity.getResult());
+            String status = AppConstants.TASK_RESULT_STATUS_NEW;
+            if (smsRespEntity.getResult().equals("0") == false) {
+                status = AppConstants.TASK_RESULT_STATUS_FAILED;
+            }
+            String detail_info =  AppConstants.SMS_SUBMIT_CODE_STATUS.get(Integer.valueOf(smsRespEntity.getResult()));
             for(SmsReqEntity.SmsMsgEntity item: send_patch){
                 tasksResultDao.updateNoticeTaskResultStatus( item.getMsgid(),
-                        status,
-                        "",
+                        AppConstants.TASK_RESULT_STATUS_NEW,
+                        detail_info,
                         send_time);
             }
             if (smsRespEntity.getResult().equals("0") == true) {
@@ -125,13 +129,11 @@ public class SmsService extends  NoticeTaskService {
                     List<SmsRespEntity.SmsRespDataEntity> items = smsRespEntity.getData();
                     for (SmsRespEntity.SmsRespDataEntity item : items) {
                         tasksResultDao.updateNoticeTaskResultStatus( item.getMsgid(),
-                                AppConstants.SMS_REPORT_CODE_STATUS.get(item.getStatus()),
-                                item.getDesc(),
+                                AppConstants.TASK_RESULT_STATUS_FAILED,
+                                AppConstants.SMS_REPORT_CODE_STATUS.get(Integer.valueOf(item.getStatus())),
                                 send_time);
                     }
-
                 }
-
             }
         }catch(Exception ee){
             Jlog.error(" update sms result error:"+ee.getMessage());

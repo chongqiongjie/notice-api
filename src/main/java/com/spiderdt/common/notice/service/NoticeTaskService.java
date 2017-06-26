@@ -15,6 +15,7 @@ import com.spiderdt.common.notice.entity.TrackRecodeEntity;
 import com.spiderdt.common.notice.errorhander.AppException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -45,6 +46,9 @@ public class NoticeTaskService {
 
     @Resource
     private EmailService emailService;
+
+    @Resource
+    private ThreadPoolTaskExecutor taskPool;
 
     @Autowired
     Slog slog;
@@ -107,11 +111,14 @@ public class NoticeTaskService {
                 throw new AppException("0","create notice task error");
             }
             task_id = noticeTasksEntity.getTaskId();
+            //下面创建任务结果详情时有点慢，可以放到线程池中运行。
             slog.debug("create notce task task_id:"+task_id+" :"+noticeTasksEntity);
+            /*
             Boolean st_result_info = createTaskResultInfo(task_id,noticeTasksEntity);
             if(st_result_info == false){
                 slog.error("create notice task result info error:"+noticeTasksEntity);
             }
+            */
         }catch (Exception ee){
             slog.error("create notice task error:"+ee.getMessage());
             throw new AppException("0","create notice task error");
@@ -133,9 +140,7 @@ public class NoticeTaskService {
                 fileService.download(downloadUrl, taskFileDir, fileName);
             }
         }
-        slog.debug("create notice task end and update status to new");
-        noticeTasksDao.updateNoticeTaskStatus(task_id,AppConstants.TASK_RESULT_STATUS_NEW,Jdate.getNowStrTime());       //全部创建成功之后，再修改成new的状态，否则会被另一个进程调度到。
-
+        slog.debug("create notice task main end and wait for notice task result create");
         return true;
     }
 
@@ -170,7 +175,17 @@ public class NoticeTaskService {
 
         JSONObject http = httpGet(url);
 
-        return http.toString();
+        //return http.toString();
+        Jlog.info("getAddressesFromJobId job_id:" + job_id);
+//        String ret = "[{\"name\":\"qiong\",\"address\":\"18217168545\"}]";
+
+        slog.debug("getAddressesFromJobId job_id:" + job_id);
+        String ret = "[{\"name\":\"qiong\",\"address\":\"18217168545\"},{\"name\":\"qiong\",\"address\":\"1821716854\"},{\"name\":\"qiong\",\"address\":\"13426007264\"}]";
+//        String ret = "[{\"name\":\"test\",\"address\":\"13458555648\"}]";
+//        String ret = "[{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"}]";
+//        String ret = "[{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"}]";
+//        String ret = "[{\"name\":\"test\",\"address\":\"chong.qiongjie@spiderdt.com\"}]";
+        return ret;
 
     }
 
@@ -183,14 +198,25 @@ public class NoticeTaskService {
      * @throws AppException
      */
     public Boolean createTaskResultInfo(Integer task_id,NoticeTasksEntity noticeTasksEntity) throws AppException {
+        Jlog.debug("create task result info begin:"+noticeTasksEntity);
+        /*
+        DefaultCreateNoticeResultTask noticeResultRunTask = new DefaultCreateNoticeResultTask();
+        noticeResultRunTask.setTaskId(task_id);
+        noticeResultRunTask.setNoticeTasksEntity(noticeTasksEntity);
+        Jlog.info("xxxxxx:"+noticeResultRunTask.toString());
+        taskPool.execute(noticeResultRunTask);
+        */
         try {
             List<NoticeTasksResultEntity> tasksResultEntities =  makeTaskResultInfo(task_id,noticeTasksEntity);
             slog.debug("get task result entities:"+tasksResultEntities);
             saveNoticeResultsBatch(tasksResultEntities);
         }catch ( Exception ee){
             slog.error("create notice task result error:"+ee.getMessage());
-            throw new AppException("0","create task result error");
+            updateNoticeTaskSatus(task_id, AppConstants.TASK_STATUS_FAILED);
+            return false;
         }
+        updateNoticeTaskSatus(task_id, AppConstants.TASK_STATUS_NEW);
+        Jlog.debug("create task result info end :"+noticeTasksEntity);
         return true;
     }
 
@@ -487,5 +513,9 @@ public class NoticeTaskService {
         return count;
     }
 
+    public List<NoticeTasksEntity> getInitNoticeTasks(){
+        List<NoticeTasksEntity> task_lists = noticeTasksDao.getNoticeTasksByStatus(AppConstants.TASK_STATUS_INIT);
+        return task_lists;
+    }
 
 }
