@@ -59,8 +59,7 @@ send_status text,
 detail_info text,
 submit_time varchar(255),
 send_time varchar(255),
-back_time varchar(255),
-is_last BOOLEAN
+back_time varchar(255)
 );
 COMMENT ON TABLE notice.notice_tasks_result_info IS '发送信息任务表详细状态表';
 COMMENT ON COLUMN notice.notice_tasks_result_info.riid IS 'UUID,可作为发送的信息ID';
@@ -73,7 +72,6 @@ COMMENT ON COLUMN notice.notice_tasks_result_info.detail_info IS '详细信息�
 COMMENT ON COLUMN notice.notice_tasks_result_info.submit_time IS '提交到服务的时间';
 COMMENT ON COLUMN notice.notice_tasks_result_info.send_time IS '发送时间 ';
 COMMENT ON COLUMN notice.notice_tasks_result_info.back_time IS '反馈时间';
-COMMENT ON COLUMN notice.notice_tasks_result_info.is_last IS '是否是 task 的最后一个';
 
 create table if not exists notice.notice_tasks_track_recode (
 track_url_suffix text primary key not null,

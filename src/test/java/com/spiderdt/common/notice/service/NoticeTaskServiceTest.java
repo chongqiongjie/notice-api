@@ -2,6 +2,7 @@ package com.spiderdt.common.notice.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.spiderdt.common.notice.common.Jlog;
 import com.spiderdt.common.notice.entity.NoticeTasksEntity;
 import com.spiderdt.common.notice.errorhander.AppException;
 import org.junit.Test;
@@ -128,6 +129,30 @@ public class NoticeTaskServiceTest {
 //        System.out.println(noticeTaskService.getAttachmentByTaskId(33));
     }
 
+    @Test
+    public void testCreateSmsTask() throws AppException {
+        NoticeTasksEntity noticeTasksEntity = new NoticeTasksEntity();
+        noticeTasksEntity.setTaskType("sms");
+        noticeTasksEntity.setClientId("jupiter");
+        noticeTasksEntity.setUserId("test");
+        noticeTasksEntity.setJobId("job_test_id");
+        noticeTasksEntity.setTemplateId(1);
+        noticeTasksEntity.setMessage("#name# 您好，http://baidu.com 还有 http://z.cn ");
+        //如果task_type==sms时
+        //noticeTasksEntity.setSubject("#name# 专属");
+        //noticeTasksEntity.setAttachments("http://xxxxxxx");
+        noticeTaskService.createNoticeTask(noticeTasksEntity);
+    }
 
 
+    @Test
+    public void countUnfixedResultByTaskId() {
+        int count = noticeTaskService.countUnfixedResultByTaskId(108);
+        System.out.println(noticeTaskService.countUnfixedResultByTaskId(108));
+        if (count == 0) {
+            Jlog.info("is last so delete task attachment dirctory!");
+        }
+//        System.out.println(noticeTaskService.countUnfixedResultByTaskId(106));
+//        System.out.println(noticeTaskService.countUnfixedResultByTaskId(102));
+    }
 }

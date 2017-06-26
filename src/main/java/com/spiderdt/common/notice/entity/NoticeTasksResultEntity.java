@@ -21,16 +21,6 @@ public class NoticeTasksResultEntity implements Serializable {
     // other value
     private String taskType;
 
-    // 是否是 task 的最后一个
-    private boolean isLast;
-
-    public boolean isLast() {
-        return isLast;
-    }
-
-    public void setLast(boolean last) {
-        isLast = last;
-    }
 
     public String getTaskType() {
         return taskType;
@@ -118,7 +108,6 @@ public class NoticeTasksResultEntity implements Serializable {
                 ", sendTime='" + sendTime + '\'' +
                 ", backTime='" + backTime + '\'' +
                 ", taskType='" + taskType + '\'' +
-                ", isLast='" + isLast + '\'' +
                 '}';
     }
 

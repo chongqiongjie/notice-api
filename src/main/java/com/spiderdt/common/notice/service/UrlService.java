@@ -8,9 +8,11 @@ import com.spiderdt.common.notice.dao.NoticeTasksDao;
 import com.spiderdt.common.notice.dao.TasksResultDao;
 import com.spiderdt.common.notice.dao.TrackRecodeDao;
 import com.spiderdt.common.notice.entity.TrackRecodeEntity;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
 
@@ -34,6 +36,55 @@ public class UrlService {
     private BitlyService bitlyService;
     @Resource
     private Sredis sredis;
+
+    @Value("${track.host}")
+    public String track_host ;
+
+    /**
+     * make 跟踪URL的后缀部分。
+     * @param dest_url
+     * @param params: rid/sc/ac
+     * @return
+     * eg. dest_url: http://www.baidu.com
+     *  params:{"rid":12,"sc":"sms","ac":"open"}
+     */
+    public String makeTrackUrlSuffix(String dest_url,Map<String,String> params){
+        JSONObject ret = new JSONObject();
+        ret.put("dest_url", URLEncoder.encode(dest_url));
+        ret.put("params",params);
+        Jlog.info("make track url info:"+ret.toJSONString());
+        //String encode_part = Jencode.sEncode(ret.toJSONString());
+        String suffix_encode_part = Jencode.MD5(ret.toJSONString());
+        return suffix_encode_part;
+    }
+    public String getCompleteTrackUrl(String suffix){
+        return track_host+suffix;
+    }
+
+    /**
+     * 解密跟踪URL
+     * @param encrtyp
+     * @return
+     */
+    public Map<String,Object> decodeTrackUrl(String encrtyp){
+        String decode_part = Jencode.sDecode(encrtyp);
+        Jlog.info("decode_part:"+ decode_part);
+        Map<String,Object> url_info  = null;
+        try {
+            JSONObject ret = JSONObject.parseObject(decode_part);
+            if(ret.containsKey("dest_url") == false || ret.containsKey("params") == false){
+                Jlog.error("track url is invalid"+encrtyp+" json:"+decode_part);
+            }
+            url_info = Maps.newHashMap();
+            url_info.put("dest_url",ret.get("dest_url").toString());
+            url_info.put("params",(Map<String,String>) ret.get("params"));
+
+        }catch (Exception ee){
+            Jlog.error("parse object from string error:"+ee.getMessage());
+        }
+        return url_info;
+
+    }
     /**
      * 批量制作track url
      * @param params
@@ -64,7 +115,7 @@ public class UrlService {
         }
         String dest_url = param.get("dest_url");
         param.remove("dest_url");
-        String track_url_suffix = Jurl.makeTrackUrlSuffix(dest_url,param);
+        String track_url_suffix = makeTrackUrlSuffix(dest_url,param);
         pair_ret = Maps.newHashMap();
         pair_ret.put(dest_url,track_url_suffix);
 

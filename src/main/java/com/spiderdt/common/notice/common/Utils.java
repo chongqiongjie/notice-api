@@ -208,16 +208,26 @@ public class Utils {
     /**
      * 获取所有的url并返回，Map<Order, Link>
      * @param message
+     * @param type email/sms
      * @return
      */
-    public static HashMap<Integer, String> getUrlsFromMessage(String message){
-
-        Pattern patternHttp = Pattern.compile("<a.*?href=[\"']?((https?://)?/?[^\"']+)[\"']?.*?>(.+)</a>");
+    public static HashMap<Integer, String> getUrlsFromMessage(String message,String type){
+        Pattern patternHttp = null;
+        if(type == null || type.equals("email") == true) {
+            patternHttp = Pattern.compile("<a.*?href=[\"']?((https?://)?/?[^\"']+)[\"']?.*?>(.+)</a>");
+        }else{
+            patternHttp = Pattern.compile("(?<!\\d)(?:(?:[\\w[.-://]]*\\.[com|cn|net|tv|gov|org|biz|cc|uk|jp|edu]+[^\\s|^\\u4e00-\\u9fa5]*))");
+        }
         Matcher matcher = patternHttp.matcher(message);
         HashMap<Integer, String> linkOrderMap = new HashMap<Integer, String>();
         int i = 0;
         while(matcher.find()) {
-            String link = matcher.group(1).trim();
+            String link = "";
+            if(type == null || type.equals("email") == true) {
+                link = matcher.group(1).trim();
+            }else{
+                link = matcher.group().trim();
+            }
             linkOrderMap.put(i, link);
             i++;
         }

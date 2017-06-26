@@ -8,4 +8,10 @@ UPDATE notice.notice_tasks_summary
     SET click_count = click_count+1
 WHERE task_id = 1;
 
-SELECT task_id, notice_count, sent_count, view_count, click_count FROM notice.notice_tasks_summary WHERE task_id =1;
+SELECT task_id, notice_count, sent_count, view_count, click_count
+FROM notice.notice_tasks_summary WHERE task_id =1;
+
+SELECT COUNT(*) FROM notice.notice_tasks_result_info
+    WHERE (send_status = 'new' OR send_status = 'authFailed')
+    AND task_id = 102;
+

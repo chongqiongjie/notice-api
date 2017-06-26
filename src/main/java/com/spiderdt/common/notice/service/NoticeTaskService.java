@@ -68,7 +68,9 @@ public class NoticeTaskService {
         List<NoticeTasksResultEntity> task_list = new ArrayList<>();
         task_list.addAll(task_list_new);
         task_list.addAll(task_list_failed);
-        Jlog.info("get task list from db, count:"+task_list.size());
+        slog.info("get task list from db, count:"+task_list.size());
+        Boolean sms_st = false;
+        Boolean email_st = false;
         if(task_list.size() > 0){
             List<NoticeTasksResultEntity> sms_task_list = Lists.newArrayList();
             List<NoticeTasksResultEntity> email_task_list = Lists.newArrayList();
@@ -79,10 +81,11 @@ public class NoticeTaskService {
                     email_task_list.add(item);
                 }
             }
-            Boolean sms_st = smsService.sendSmsBatch(sms_task_list);
-            Boolean email_st = emailService.sendEmailBatch(email_task_list);
-            Jlog.info("send notice end:sms:"+sms_st+" email:"+email_st);
+
+            sms_st = smsService.sendSmsBatch(sms_task_list);
+            email_st = emailService.sendEmailBatch(email_task_list);
         }
+        slog.info("send notice end:sms:"+sms_st+" email:"+email_st);
     }
     /**
      *  创建一个通知task。包括初始化result_info表。
@@ -92,11 +95,9 @@ public class NoticeTaskService {
      */
     public Boolean createNoticeTask(NoticeTasksEntity noticeTasksEntity) throws AppException {
         slog.debug("create notice task:"+noticeTasksEntity);
-        noticeTasksEntity.setParentTaskId(0);
-        noticeTasksEntity.setStatus("new");
-        noticeTasksEntity.setCreateTime(Jdate.getNowStrTime());
-        noticeTasksEntity.setUpdateTime(Jdate.getNowStrTime());
+        //检测参数是否合法
         checkNoticeTaskParams(noticeTasksEntity);
+        Integer task_id = 0;
         try {
             //设置地址和用户名 address 为　json 字符串，多个邮箱
             noticeTasksEntity.setAddresses(getAddressesFromJobId(noticeTasksEntity.getJobId()));
@@ -105,8 +106,8 @@ public class NoticeTaskService {
                 slog.error("create notice task entity error:"+noticeTasksEntity);
                 throw new AppException("0","create notice task error");
             }
-            Integer task_id = noticeTasksEntity.getTaskId();
-            slog.debug("create notce task task_id:"+task_id);
+            task_id = noticeTasksEntity.getTaskId();
+            slog.debug("create notce task task_id:"+task_id+" :"+noticeTasksEntity);
             Boolean st_result_info = createTaskResultInfo(task_id,noticeTasksEntity);
             if(st_result_info == false){
                 slog.error("create notice task result info error:"+noticeTasksEntity);
@@ -121,7 +122,7 @@ public class NoticeTaskService {
         String taskFileDir = attachmentStorePath + "/" + taskId + "/" ;
         String attachmentJsonString = noticeTasksEntity.getAttachments();
         // path list 中可能有一个值，但是为 ""
-        if (!"".equals(attachmentJsonString)) {
+        if (null != attachmentJsonString && !"".equals(attachmentJsonString)) {
             ArrayList<String> paths = new ArrayList<>();
 
             JSONArray jsonArray = JSON.parseArray(attachmentJsonString);
@@ -132,6 +133,8 @@ public class NoticeTaskService {
                 fileService.download(downloadUrl, taskFileDir, fileName);
             }
         }
+        slog.debug("create notice task end and update status to new");
+        noticeTasksDao.updateNoticeTaskStatus(task_id,AppConstants.TASK_RESULT_STATUS_NEW,Jdate.getNowStrTime());       //全部创建成功之后，再修改成new的状态，否则会被另一个进程调度到。
 
         return true;
     }
@@ -230,10 +233,11 @@ public class NoticeTaskService {
      */
     public List<TrackRecodeEntity> makeTrackRecodeInfo(NoticeTasksResultEntity noticeTasksResultEntity){
         //抽取message中所有的url。
-        HashMap<Integer, String> orgUrlsOrderMap = Utils.getUrlsFromMessage(noticeTasksResultEntity.getMessage());
+        HashMap<Integer, String> orgUrlsOrderMap = Utils.getUrlsFromMessage(noticeTasksResultEntity.getMessage(),noticeTasksResultEntity.getTaskType());
+        slog.debug("parse url:"+orgUrlsOrderMap);
         List<TrackRecodeEntity> tr_lists = Lists.newArrayList();
         for (Map.Entry<Integer, String> entry : orgUrlsOrderMap.entrySet()) {
-            System.out.println("Key = " + entry.getKey() + ", Value = "  + entry.getValue());
+            slog.debug("Key = " + entry.getKey() + ", Value = "  + entry.getValue());
             TrackRecodeEntity tr_entity = new TrackRecodeEntity();
             Map<String,String> trackUrlParam = Maps.newHashMap();
             trackUrlParam.put("dest_url",entry.getValue());
@@ -285,7 +289,7 @@ public class NoticeTaskService {
         String message = noticeTasksResultEntity.getMessage();
         for(TrackRecodeEntity recode: recodes){
             String url_org = recode.getUrlOrg();
-            String track_url = Jurl.getCompleteTrackUrl(recode.getTrackUrlSuffix());
+            String track_url = urlService.getCompleteTrackUrl(recode.getTrackUrlSuffix());
             message = replaceUrlFromMessage(noticeTasksResultEntity.getTaskType(),message,url_org,track_url);
         }
         return message;
@@ -320,7 +324,7 @@ public class NoticeTaskService {
         if(item.getTaskType().equals(AppConstants.EMAIL_TASK_TYPE) == true){
             for(TrackRecodeEntity tr: trackRecodeEntities){
                if(tr.getTrackType().equals(this.image_track_type) == true){
-                   String track_url = Jurl.getCompleteTrackUrl(tr.getTrackUrlSuffix());
+                   String track_url = urlService.getCompleteTrackUrl(tr.getTrackUrlSuffix());
                    track_url = "<img src=\""+track_url+"\" width=\"0\" height=\"0\" style=\"display: none\"/>";
                    return item.getMessage()+ track_url;
                }
@@ -340,19 +344,14 @@ public class NoticeTaskService {
     public List<NoticeTasksResultEntity> makeTaskResultInfo(Integer task_id,NoticeTasksEntity noticeTasksEntity) throws AppException {
 
         List<Map<String,String>> addresses_map_list = getAddresssesFromJsonString(noticeTasksEntity.getAddresses());
+        slog.debug("get address map list :"+addresses_map_list);
         List<NoticeTasksResultEntity> resultInfoList =  Lists.newArrayList();
         List<TrackRecodeEntity> all_trackRecodeEntities = Lists.newArrayList();
         int sizeOfAddressMapList = addresses_map_list.size();
-        int i = 1;
-        boolean isLast = false;
         for(Map<String,String> address_map:addresses_map_list){
 
             NoticeTasksResultEntity item = new NoticeTasksResultEntity();
             String address = address_map.get(this.json_address_key);
-            if(i == addresses_map_list.size()) {
-                Jlog.info("task last addree:" + address);
-                isLast = true;
-            }
             String message = noticeTasksEntity.getMessage();
             String subject = noticeTasksEntity.getSubject();
             for(Map.Entry<String,String> entry : address_map.entrySet()){
@@ -367,13 +366,13 @@ public class NoticeTaskService {
             //trick
             item.setTaskType(noticeTasksEntity.getTaskType());      //主要用于后续流程区分
             item.setAddress(address);
-            item.setLast(isLast);
             item.setMessage(message);       //设置替换URL之前的message。用于传递参数给后面流程,后面会用替换trackurl后的message覆盖。
             item.setSubject(subject);       //如果是sms,可以不用设置。
             item.setSendStatus(AppConstants.TASK_RESULT_STATUS_NEW);
             item.setSubmitTime(Jdate.getNowStrTime());
             List<TrackRecodeEntity> trackRecodeEntities = makeTrackRecodeInfo(item);
 
+            slog.debug("track recode info"+trackRecodeEntities);
             //更换原始URL to track url
             item.setMessage(replaceMessageUrlToTrackUrl(item,trackRecodeEntities));
             //添加结尾隐藏的跟踪链接.邮件需要实现
@@ -383,7 +382,6 @@ public class NoticeTaskService {
                 trackRecodeEntity.setMessageReplace(item.getMessage());
                 all_trackRecodeEntities.add(trackRecodeEntity);
             }
-            i += 1;
         }
         slog.debug("get NoticeTasksResultEntity:"+resultInfoList);
         try {
@@ -402,6 +400,7 @@ public class NoticeTaskService {
      * @return
      */
     public Boolean saveNoticeResultsBatch(List<NoticeTasksResultEntity> lists) throws AppException {
+        slog.debug("save notice result batch begin :"+lists);
         Boolean st = true;
         int lsize = lists.size();
         float fsize = 100f;
@@ -414,12 +413,13 @@ public class NoticeTaskService {
                     end = lsize;
                 }
                 List<NoticeTasksResultEntity> patch = lists.subList(i * isize, end);
-                tasksResultDao.createNoticeTaskResultBatch(patch);
+                st = tasksResultDao.createNoticeTaskResultBatch(patch);
             }
         }catch (Exception ee){
             Jlog.error("save notice result error:"+ee.getMessage());
             throw new AppException("0","save notice result error:"+ee.getMessage());
         }
+        slog.debug("save notice result batch end");
         return st;
     }
     /**
@@ -429,6 +429,7 @@ public class NoticeTaskService {
      * @throws AppException
      */
     public Boolean saveTrackRecodeBatch(List<TrackRecodeEntity> lists) throws AppException {
+        slog.debug("save track recode batch:"+lists);
         Boolean st = true;
         int lsize = lists.size();
         float fsize = 100f;
@@ -441,7 +442,7 @@ public class NoticeTaskService {
                     end = lsize;
                 }
                 List<TrackRecodeEntity> patch = lists.subList(i * isize, end);
-                Jlog.info("----------------------------- patch:" + patch);
+                Jlog.debug("patch:" + patch);
                 trackRecodeDao.addTrackRecodeInfoBatch(patch);
             }
         }catch (Exception ee){
@@ -477,5 +478,15 @@ public class NoticeTaskService {
     public NoticeTasksEntity getAttachmentByTaskId(int taskId) {
         return noticeTasksDao.getAttachmentByTaskId(taskId);
     };
+
+    /**
+     * 通过 taskId统计没有发送或登录失败的个数
+     * @return
+     */
+    public int countUnfixedResultByTaskId(int taskId) {
+        int count = tasksResultDao.countUnfixedResultByTaskId(taskId, AppConstants.TASK_STATUS_NEW, AppConstants.TASK_RESULT_STATUS_AUTH_FAILED);
+        return count;
+    }
+
 
 }

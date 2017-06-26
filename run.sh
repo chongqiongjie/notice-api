@@ -7,8 +7,9 @@ if [ $type == 'prod' ];then
     mvn clean install -Pprod
 fi
 if [ $type == 'test' ]; then
-    mvn clean install -Ptest
-    scp -r ./target/chain-api.war spiderdt@192.168.1.2:/data/tmp/
+    mvn clean install  -Dmaven.test.skip=true -Ptest
+    scp -r ./target/notice-api.war spiderdt@192.168.1.2:/data/tmp/
+    ssh -p 22 spiderdt@192.168.1.2 'sudo mv /data/tmp/notice-api.war /data/tomcat/'
 fi
 #default
 if [ $type ==  'dev' ]; then

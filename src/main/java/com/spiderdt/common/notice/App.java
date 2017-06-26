@@ -7,7 +7,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  * deamon 任务
- *
+ * 目前被ScheduleNoticeSendTask取代。
  */
 public class App 
 {
@@ -17,13 +17,13 @@ public class App
         NoticeTaskService noticeTaskService =(NoticeTaskService)ctx.getBean("noticeTaskService");
         Jlog.info("begin run notice service and get notice task service");
         while(true) {
-            Jlog.info("loop begin send by db scan");
+            //Jlog.info("loop begin send by db scan");
             try {
-                noticeTaskService.sendNoticeTaskByDbScan();
+                //noticeTaskService.sendNoticeTaskByDbScan();
             }catch (Exception ee){
                 Jlog.error("send notice by db scan task error:"+ee.getMessage());
             }
-            Jlog.info("loop end send notice by db scan and sleep....");
+            //Jlog.info("loop end send notice by db scan and sleep....");
             try {
                 Thread.sleep(10000);     //sleep
             } catch (InterruptedException e) {

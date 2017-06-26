@@ -12,7 +12,7 @@ import java.util.List;
 @Repository
 public interface TasksResultDao {
 
-    public void createNoticeTaskResultBatch(List<NoticeTasksResultEntity> noticeTasksEntitys);
+    public Boolean createNoticeTaskResultBatch(List<NoticeTasksResultEntity> noticeTasksEntitys);
 
     /**
      * 获取结果数据表中状态为new的结果。
@@ -48,5 +48,14 @@ public interface TasksResultDao {
                                                    @Param("detail_info") String detail_info,
                                                    @Param("send_time") String send_time,
                                                    @Param("back_time") String back_time);
+
+    /**
+     * 通过 taskId统计没有发送或登录失败的个数
+     * @param taskId
+     * @param newStatus
+     * @param authFailedStatus
+     * @return
+     */
+    public int countUnfixedResultByTaskId(@Param("taskId") int taskId, @Param("newStatus") String newStatus, @Param("authFailedStatus") String authFailedStatus);
 
 }
