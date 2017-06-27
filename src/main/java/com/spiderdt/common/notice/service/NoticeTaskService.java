@@ -3,6 +3,7 @@ package com.spiderdt.common.notice.service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.spiderdt.common.notice.common.*;
@@ -54,6 +55,10 @@ public class NoticeTaskService {
 
     @Value("${attachment.storePath}") String attachmentStorePath;
 
+    public static final String EMAIL_TYPE = "email";
+    public static final String SMS_TYPE = "sms";
+
+
     protected  String json_address_key = "address"; //phone/email
     protected  String url_ac = "click";
     protected  String track_type = "click";
@@ -100,7 +105,7 @@ public class NoticeTaskService {
         Integer task_id = 0;
         try {
             //设置地址和用户名 address 为　json 字符串，多个邮箱
-            noticeTasksEntity.setAddresses(getAddressesFromJobId(noticeTasksEntity.getJobId()));
+            noticeTasksEntity.setAddresses(getAddressesFromJobId(noticeTasksEntity.getJobId(),noticeTasksEntity.getTaskType()));
             Integer count = noticeTasksDao.createNoticeTask(noticeTasksEntity);
             if(count !=  1 ){
                 slog.error("create notice task entity error:"+noticeTasksEntity);
@@ -155,7 +160,7 @@ public class NoticeTaskService {
      * @return
      * name,phone/email json string
      */
-    public String getAddressesFromJobId(String job_id){
+    public String getAddressesFromJobId(String job_id,String mes_type){
 
 //        Jlog.info("getAddressesFromJobId job_id:" + job_id);
 ////        String ret = "[{\"name\":\"qiong\",\"address\":\"18217168545\"}]";
@@ -167,8 +172,62 @@ public class NoticeTaskService {
 //        return ret;
          String clientUrl = "http://192.168.1.2:8095/";
          String url = clientUrl + "jupiter-v1/jupiter/client_info/" + job_id + "?data_source=latetime" ;
+         JSONObject http = httpGet(url);
 
-        JSONObject http = httpGet(url);
+       String str = null;
+          List<Object> client_info = (List<Object>) http.get("client_info");
+        //System.out.println("client_info111:" + client_info);
+        JSONArray personList = new JSONArray();
+        for(int i=0;i<client_info.size();i++) {
+            JSONObject person = new JSONObject();
+            JSONArray mess_info = (JSONArray) client_info.get(i);
+            //System.out.println("mess_info:" + mess_info);
+            JSONObject mess_item = (JSONObject) mess_info.get(0);
+
+            String e_mail = (String) mess_item.get("e_mail");
+            String address = (String) mess_item.get("info_list");
+           // System.out.println(address);
+
+
+//
+//            JSONObject address = (JSONObject) mess_info.get(1);
+//           // System.out.println("ppp:" + address);
+
+
+              JSONArray items = JSONArray.parseArray(address);
+              for(int j=0;j<items.size();j++){
+                  JSONArray sub_item = items.getJSONArray(j);
+                  String name = sub_item.getString(0);
+                  String phone = sub_item.getString(1);
+                  String sendTo;
+                  if(EMAIL_TYPE.equals(mes_type) && e_mail != null){
+                      sendTo = e_mail;
+                      person.put("name", name);
+                      person.put("email", e_mail);
+                  } else if (SMS_TYPE.equals(mes_type) && !"".equals(phone)) {
+                      sendTo = phone;
+                      person.put("name", name);
+                      JSONArray phoneList;
+                      if ((phoneList = (JSONArray) person.get("phone")) == null) {
+                          phoneList = new JSONArray();
+                          phoneList.add(phone);
+                      } else {
+                          personList.add(phone);
+                      }
+                      person.put("phone", phoneList);
+                  } else {
+                      continue;
+                  }
+//                  str = String.format("[\"name\":%s,\"address\":%s]", name,sendTo );
+//                  System.out.println("str:" + str);
+              }
+            if (!person.isEmpty()) {
+                personList.add(person);
+            }
+        }
+//
+
+        System.out.println(personList);
 
         return http.toString();
 

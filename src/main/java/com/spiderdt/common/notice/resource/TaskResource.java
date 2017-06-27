@@ -50,16 +50,16 @@ public class TaskResource {
 
     }
 
-    /**
-     * 通过job_id获取用户名和address
-     */
-    @GET
-    @Consumes({ MediaType.APPLICATION_JSON })
-    public Response getAddressesFromJobId(String job_id) throws AppException {
-        String address = noticeTaskService.getAddressesFromJobId(job_id);
-        slog.info("getAddressesFromJobId:" + address);
-        return Response.status(Response.Status.CREATED)
-                .entity(Utils.getRespons()).build();
-
-    }
+//    /**
+//     * 通过job_id获取用户名和address
+//     */
+//    @GET
+//    @Consumes({ MediaType.APPLICATION_JSON })
+//    public Response getAddressesFromJobId(String job_id) throws AppException {
+//        String address = noticeTaskService.getAddressesFromJobId(job_id);
+//        slog.info("getAddressesFromJobId:" + address);
+//        return Response.status(Response.Status.CREATED)
+//                .entity(Utils.getRespons()).build();
+//
+//    }
 }
