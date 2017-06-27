@@ -13,29 +13,43 @@
 		</filter>
 	</appender>
 
-  	<appender name="dailyRollingFileAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+  	<appender name="infoAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
 		<File>${logdir}/logs/${logname}.log</File>
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
 		    <!-- daily rollover -->
 			<FileNamePattern>${logdir}/logs/${logname}/${logname}.%d{yyyy-MM-dd}.log</FileNamePattern>
-			
-			<!-- keep 30 days' worth of history -->
-			<maxHistory>30</maxHistory>			
+			<maxHistory>30</maxHistory>
 		</rollingPolicy>
- 
 		<encoder>
 			<Pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{35} - %msg %n</Pattern>
-		</encoder> 	    
+		</encoder>
+		<filter class="ch.qos.logback.classic.filter.LevelFilter">
+			<level>INFO</level>
+			<onMatch>ACCEPT</onMatch>
+		</filter>
   	</appender>
-  	<appender name="minuteRollingFileAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+	<appender name="errorAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<File>${logdir}/logs/${logname}_error.log</File>
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-		    <!-- rollover every minute -->
-			<FileNamePattern>${logdir}/logs/${logname}-minutes/${logname}-minute.%d{yyyy-MM-dd_HH-mm}.log</FileNamePattern>
-			
-			<!-- keep 1 day worth of history -->
-			<maxHistory>1</maxHistory>			
+			<!-- daily rollover -->
+			<FileNamePattern>${logdir}/logs/${logname}/${logname}_error.%d{yyyy-MM-dd}.log</FileNamePattern>
+			<maxHistory>30</maxHistory>
 		</rollingPolicy>
- 
+		<encoder>
+			<Pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{35} - %msg %n</Pattern>
+		</encoder>
+		<filter class="ch.qos.logback.classic.filter.LevelFilter"><!-- 只打印错误日志 -->
+			<level>ERROR</level>
+			<onMatch>ACCEPT</onMatch>
+			<onMismatch>DENY</onMismatch>
+		</filter>
+	</appender>
+  	<appender name="debugAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<File>${logdir}/logs/${logname}_debug.log</File>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<FileNamePattern>${logdir}/logs/${logname}/${logname}_debug.%d{yyyy-MM-dd}.log</FileNamePattern>
+			<maxHistory>10</maxHistory>
+		</rollingPolicy>
 		<encoder>
 			<Pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{35} - %msg %n</Pattern>
 		</encoder> 	    
@@ -43,7 +57,9 @@
   		
 	<logger name="com.spiderdt.common" additivity="false">
 	    <level value="${log.level}" />
-		<appender-ref ref="dailyRollingFileAppender"/>
+		<appender-ref ref="infoAppender"/>
+		<appender-ref ref="errorAppender"/>
+		<appender-ref ref="debugAppender"/>
 		<appender-ref ref="consoleAppender" />
 	</logger>
 
