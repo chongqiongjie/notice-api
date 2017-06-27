@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by fivebit on 2017/5/19.
@@ -43,6 +44,9 @@ public interface NoticeTasksDao {
      * @return
      */
     public Boolean updateNoticeTaskStatus(@Param("task_id") Integer task_id,
+                                          @Param("status") String status,
+                                          @Param("update_time") String update_time);
+    public Boolean updateNoticeTaskStatusBatch(@Param("task_ids") Set<Integer> task_ids,
                                           @Param("status") String status,
                                           @Param("update_time") String update_time);
 

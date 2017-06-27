@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.spiderdt.common.notice.common.*;
 import com.spiderdt.common.notice.dao.NoticeTasksDao;
 import com.spiderdt.common.notice.dao.TasksResultDao;
@@ -16,6 +17,7 @@ import com.spiderdt.common.notice.entity.TrackRecodeEntity;
 import com.spiderdt.common.notice.errorhander.AppException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -46,6 +48,9 @@ public class NoticeTaskService {
 
     @Resource
     private EmailService emailService;
+
+    @Resource
+    private ThreadPoolTaskExecutor taskPool;
 
     @Autowired
     Slog slog;
@@ -89,6 +94,15 @@ public class NoticeTaskService {
 
             sms_st = smsService.sendSmsBatch(sms_task_list);
             email_st = emailService.sendEmailBatch(email_task_list);
+            Set<Integer> task_ids = Sets.newHashSet();
+            List<String> riid_lists = Lists.newArrayList();
+            for(NoticeTasksResultEntity item:task_list){
+                task_ids.add(item.getTaskId());
+                riid_lists.add(item.getRiid());
+            }
+            updateTaskStatusBatch(task_ids,AppConstants.TASK_STATUS_SENDING);
+            updateTaskResultStatusBatch(riid_lists,AppConstants.TASK_STATUS_SENDING);
+
         }
         slog.info("send notice end:sms:"+sms_st+" email:"+email_st);
     }
@@ -112,11 +126,14 @@ public class NoticeTaskService {
                 throw new AppException("0","create notice task error");
             }
             task_id = noticeTasksEntity.getTaskId();
+            //下面创建任务结果详情时有点慢，可以放到线程池中运行。
             slog.debug("create notce task task_id:"+task_id+" :"+noticeTasksEntity);
+            /*
             Boolean st_result_info = createTaskResultInfo(task_id,noticeTasksEntity);
             if(st_result_info == false){
                 slog.error("create notice task result info error:"+noticeTasksEntity);
             }
+            */
         }catch (Exception ee){
             slog.error("create notice task error:"+ee.getMessage());
             throw new AppException("0","create notice task error");
@@ -242,14 +259,25 @@ public class NoticeTaskService {
      * @throws AppException
      */
     public Boolean createTaskResultInfo(Integer task_id,NoticeTasksEntity noticeTasksEntity) throws AppException {
+        Jlog.debug("create task result info begin:"+noticeTasksEntity);
+        /*
+        DefaultCreateNoticeResultTask noticeResultRunTask = new DefaultCreateNoticeResultTask();
+        noticeResultRunTask.setTaskId(task_id);
+        noticeResultRunTask.setNoticeTasksEntity(noticeTasksEntity);
+        Jlog.info("xxxxxx:"+noticeResultRunTask.toString());
+        taskPool.execute(noticeResultRunTask);
+        */
         try {
             List<NoticeTasksResultEntity> tasksResultEntities =  makeTaskResultInfo(task_id,noticeTasksEntity);
             slog.debug("get task result entities:"+tasksResultEntities);
             saveNoticeResultsBatch(tasksResultEntities);
         }catch ( Exception ee){
             slog.error("create notice task result error:"+ee.getMessage());
-            throw new AppException("0","create task result error");
+            updateNoticeTaskSatus(task_id, AppConstants.TASK_STATUS_FAILED);
+            return false;
         }
+        updateNoticeTaskSatus(task_id, AppConstants.TASK_STATUS_NEW);
+        Jlog.debug("create task result info end :"+noticeTasksEntity);
         return true;
     }
 
@@ -547,5 +575,40 @@ public class NoticeTaskService {
         return count;
     }
 
+    public List<NoticeTasksEntity> getInitNoticeTasks(){
+        List<NoticeTasksEntity> task_lists = noticeTasksDao.getNoticeTasksByStatus(AppConstants.TASK_STATUS_INIT);
+        return task_lists;
+    }
+
+    /**
+     * 批量更新task的状态
+     * @param task_ids
+     * @param status
+     */
+    public void updateTaskStatusBatch(Set<Integer> task_ids,String status) throws AppException {
+        String update_time = Jdate.getNowStrTime();
+        try{
+            noticeTasksDao.updateNoticeTaskStatusBatch(task_ids,status,update_time);
+        }catch (Exception ee){
+            slog.error("update task status batch error:"+ee.getMessage());
+            throw new AppException("0","update task status error");
+        }
+    }
+
+    /**
+     * 批量更新task result 的发送状态
+     * @param task_ids
+     * @param status
+     * @throws AppException
+     */
+    public void updateTaskResultStatusBatch(List<String> riid_list,String status) throws AppException {
+        String update_time = Jdate.getNowStrTime();
+        try{
+            tasksResultDao.updateNoticeTaskResultStatusBatch(riid_list,status,update_time);
+        }catch (Exception ee){
+            slog.error("update task result status batch error:"+ee.getMessage());
+            throw new AppException("0","update task resutl status error");
+        }
+    }
 
 }

@@ -19,6 +19,8 @@ status text,
 create_time varchar(255),
 update_time varchar(255)
 );
+create index idx_notice_notice_tasks_user_id_status on notice.notice_tasks (user_id,status);
+create index idx_notice_notice_tasks_status on notice.notice_tasks (status);
 COMMENT ON TABLE notice.notice_tasks IS '发送信息任务表';
 COMMENT ON COLUMN notice.notice_tasks.task_id IS '任务ID';
 COMMENT ON COLUMN notice.notice_tasks.parent_task_id IS '父任务';
@@ -61,6 +63,8 @@ submit_time varchar(255),
 send_time varchar(255),
 back_time varchar(255)
 );
+create index idx_notice_notice_tasks_result_info_task_id on notice.notice_tasks_result_info (task_id);
+create index idx_notice_notice_tasks_result_info_send_status on notice.notice_tasks_result_info (send_status);
 COMMENT ON TABLE notice.notice_tasks_result_info IS '发送信息任务表详细状态表';
 COMMENT ON COLUMN notice.notice_tasks_result_info.riid IS 'UUID,可作为发送的信息ID';
 COMMENT ON COLUMN notice.notice_tasks_result_info.task_id IS '任务id';
@@ -85,6 +89,7 @@ params text,
 is_click int,
 click_time varchar(255)
 );
+create index idx_notice_notice_tasks_track_recode_task_id on notice.notice_tasks_track_recode (task_id);
 COMMENT ON TABLE notice.notice_tasks_track_recode IS 'url加密对以及记录该加密url的一些来源等属性';
 COMMENT ON COLUMN notice.notice_tasks_track_recode.track_url_suffix IS 'track url的后缀,是md5 url_org和params加密之后的字符串';
 COMMENT ON COLUMN notice.notice_tasks_track_recode.track_type IS 'track url type eg:click/open ';

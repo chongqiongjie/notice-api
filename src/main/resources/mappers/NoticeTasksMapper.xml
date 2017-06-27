@@ -45,5 +45,12 @@
 	<select id="getAttachmentByTaskId" resultMap="TaskResultMap">
 		select attachments from notice.notice_tasks where task_id=#{taskId};
 	</select>
-
+	<update id="updateNoticeTaskStatusBatch">
+		update notice.notice_tasks
+		set status=#{status},update_time=#{update_time}
+		where task_id in
+		<foreach collection="task_ids" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+		</foreach>
+	</update>
 </mapper>

@@ -69,7 +69,7 @@ public class DefaultSmsSendTask implements  SmsRunTask{
                     end = list_size;
                 }
                 List<SmsReqEntity.SmsMsgEntity> patch = smsMsgEntitys.subList(i * sms_batch, end);
-                Jlog.debug("patch:"+patch);
+                Jlog.debug("send sms path lists:"+patch);
                 sendEntity.setData(patch);
                 JSONObject http_ret = JhttpClient.httpPost(sms_host_url,(JSONObject) JSON.toJSON(sendEntity));
                 Jlog.info("http post return:"+http_ret.toJSONString());

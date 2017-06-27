@@ -126,7 +126,6 @@ public class EmailService {
         for (int i = 0; i < len; i++) {
             NoticeTasksResultEntity item = items.get(i);
             taskId = item.getTaskId();
-            noticeTaskService.updateNoticeTaskSatus(taskId, AppConstants.TASK_STATUS_SENDING);
             try {
                 sendTime = Jdate.getNowStrTime();
                 mimeMessagesList[i] = sender.createMimeMessage();
