@@ -35,6 +35,16 @@ public interface TasksResultDao {
                                                 @Param("submit_time") String submit_time);
 
     /**
+     * 发送通知之后，需要更新记录状态
+     * @param msgids
+     * @param status
+     * @param send_time
+     * @return
+     */
+    public Boolean updateNoticeTaskResultStatusBatch( @Param("msgids") List<String> msgids,
+                                                 @Param("status") String status,
+                                                 @Param("send_time") String send_time);
+    /**
      * 更新状态、详情、发送时间、反馈时间
      * @param msgid
      * @param status

@@ -52,6 +52,7 @@ public class SmsService extends  NoticeTaskService {
     public Boolean sendSmsBatch(List<NoticeTasksResultEntity> items) throws AppException {
         List<SmsReqEntity.SmsMsgEntity> smsMsgEntitys = makeMsgEntitys(items);
         sendMsgToHttpClient( smsMsgEntitys);
+
         return true;
     }
 
@@ -157,8 +158,13 @@ public class SmsService extends  NoticeTaskService {
                 if(smsReportEntity.getReports().size() > 0){
                     List<SmsReportEntity.SmsReportInfoEntity> items = smsReportEntity.getReports();
                     for(SmsReportEntity.SmsReportInfoEntity item:items){
+                        String status = AppConstants.TASK_RESULT_STATUS_SUCCESS;
+                        if(item.getStatus().equals("0") == false){
+                            status = AppConstants.TASK_RESULT_STATUS_FAILED;
+                        }
                         tasksResultDao.updateNoticeTaskBackInfoStatus(item.getMsgid(),
-                                item.getStatus(),item.getDesc(),item.getTime(),back_time);
+                                status,AppConstants.SMS_REPORT_CODE_STATUS.get(Integer.valueOf(item.getStatus()))
+                                ,item.getTime(),back_time);
                     }
                 }
             }

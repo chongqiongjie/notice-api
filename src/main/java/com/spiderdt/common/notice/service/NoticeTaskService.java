@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.spiderdt.common.notice.common.*;
 import com.spiderdt.common.notice.dao.NoticeTasksDao;
 import com.spiderdt.common.notice.dao.TasksResultDao;
@@ -88,6 +89,15 @@ public class NoticeTaskService {
 
             sms_st = smsService.sendSmsBatch(sms_task_list);
             email_st = emailService.sendEmailBatch(email_task_list);
+            Set<Integer> task_ids = Sets.newHashSet();
+            List<String> riid_lists = Lists.newArrayList();
+            for(NoticeTasksResultEntity item:task_list){
+                task_ids.add(item.getTaskId());
+                riid_lists.add(item.getRiid());
+            }
+            updateTaskStatusBatch(task_ids,AppConstants.TASK_STATUS_SENDING);
+            updateTaskResultStatusBatch(riid_lists,AppConstants.TASK_STATUS_SENDING);
+
         }
         slog.info("send notice end:sms:"+sms_st+" email:"+email_st);
     }
@@ -104,7 +114,7 @@ public class NoticeTaskService {
         Integer task_id = 0;
         try {
             //设置地址和用户名 address 为　json 字符串，多个邮箱
-            noticeTasksEntity.setAddresses(getAddressesFromJobId(noticeTasksEntity.getJobId()));
+            noticeTasksEntity.setAddresses(getAddressesFromJobId(noticeTasksEntity.getJobId(),noticeTasksEntity.getTaskType()));
             Integer count = noticeTasksDao.createNoticeTask(noticeTasksEntity);
             if(count !=  1 ){
                 slog.error("create notice task entity error:"+noticeTasksEntity);
@@ -160,33 +170,22 @@ public class NoticeTaskService {
      * @return
      * name,phone/email json string
      */
-    public String getAddressesFromJobId(String job_id){
+    public String getAddressesFromJobId(String job_id,String task_type){
 
-//        Jlog.info("getAddressesFromJobId job_id:" + job_id);
-////        String ret = "[{\"name\":\"qiong\",\"address\":\"18217168545\"}]";
 ////        String ret = "[{\"name\":\"test\",\"address\":\"13458555648\"}]";
-////        String ret = "[{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"}]";
 //       // String ret = "[{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"}]";
 //        String ret = "[{\"name\":\"test\",\"address\":\"chong.qiongjie@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"}]";
 ////        String ret = "[{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"}, {\"name\":\"test2\",\"address\":\"13458555648@163.com\"}]";
-//        return ret;
-         String clientUrl = "http://192.168.1.2:8095/";
-         String url = clientUrl + "jupiter-v1/jupiter/client_info/" + job_id + "?data_source=latetime" ;
-
-        JSONObject http = httpGet(url);
-
-        //return http.toString();
+        if(task_type.equals("email") == true) {
+            String clientUrl = "http://192.168.1.2:8095/";
+            String url = clientUrl + "jupiter-v1/jupiter/client_info/" + job_id + "?data_source=latetime";
+            JSONObject http = httpGet(url);
+            return http.toString();
+        }
         Jlog.info("getAddressesFromJobId job_id:" + job_id);
-//        String ret = "[{\"name\":\"qiong\",\"address\":\"18217168545\"}]";
-
         slog.debug("getAddressesFromJobId job_id:" + job_id);
         String ret = "[{\"name\":\"qiong\",\"address\":\"18217168545\"},{\"name\":\"qiong\",\"address\":\"1821716854\"},{\"name\":\"qiong\",\"address\":\"13426007264\"}]";
-//        String ret = "[{\"name\":\"test\",\"address\":\"13458555648\"}]";
-//        String ret = "[{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"}]";
-//        String ret = "[{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"}]";
-//        String ret = "[{\"name\":\"test\",\"address\":\"chong.qiongjie@spiderdt.com\"}]";
         return ret;
-
     }
 
     /**
@@ -516,6 +515,37 @@ public class NoticeTaskService {
     public List<NoticeTasksEntity> getInitNoticeTasks(){
         List<NoticeTasksEntity> task_lists = noticeTasksDao.getNoticeTasksByStatus(AppConstants.TASK_STATUS_INIT);
         return task_lists;
+    }
+
+    /**
+     * 批量更新task的状态
+     * @param task_ids
+     * @param status
+     */
+    public void updateTaskStatusBatch(Set<Integer> task_ids,String status) throws AppException {
+        String update_time = Jdate.getNowStrTime();
+        try{
+            noticeTasksDao.updateNoticeTaskStatusBatch(task_ids,status,update_time);
+        }catch (Exception ee){
+            slog.error("update task status batch error:"+ee.getMessage());
+            throw new AppException("0","update task status error");
+        }
+    }
+
+    /**
+     * 批量更新task result 的发送状态
+     * @param task_ids
+     * @param status
+     * @throws AppException
+     */
+    public void updateTaskResultStatusBatch(List<String> riid_list,String status) throws AppException {
+        String update_time = Jdate.getNowStrTime();
+        try{
+            tasksResultDao.updateNoticeTaskResultStatusBatch(riid_list,status,update_time);
+        }catch (Exception ee){
+            slog.error("update task result status batch error:"+ee.getMessage());
+            throw new AppException("0","update task resutl status error");
+        }
     }
 
 }

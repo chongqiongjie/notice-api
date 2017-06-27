@@ -1,7 +1,7 @@
 package com.spiderdt.common.notice.service;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
+import com.google.common.collect.Sets;
+import com.spiderdt.common.notice.common.AppConstants;
 import com.spiderdt.common.notice.common.Jlog;
 import com.spiderdt.common.notice.entity.NoticeTasksEntity;
 import com.spiderdt.common.notice.errorhander.AppException;
@@ -11,8 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.ArrayList;
-import java.util.Map;
+import java.util.Set;
 
 /**
  * @author ranran
@@ -82,7 +81,7 @@ public class NoticeTaskServiceTest {
     @Test
     public void getAddressesFromJobId() throws Exception {
        String job_id = "latetime_feature2_20161101_20161115";
-        System.out.println(noticeTaskService.getAddressesFromJobId(job_id));
+        System.out.println(noticeTaskService.getAddressesFromJobId(job_id,"email"));
     }
 
     @Test
@@ -154,5 +153,14 @@ public class NoticeTaskServiceTest {
         }
 //        System.out.println(noticeTaskService.countUnfixedResultByTaskId(106));
 //        System.out.println(noticeTaskService.countUnfixedResultByTaskId(102));
+    }
+
+    @Test
+    public void testupdateTaskStatusBatch() throws AppException {
+        Set<Integer> task_ids = Sets.newHashSet();
+        task_ids.add(147);
+        task_ids.add(146);
+        task_ids.add(145);
+        noticeTaskService.updateTaskStatusBatch(task_ids, AppConstants.TASK_STATUS_SENDING);
     }
 }

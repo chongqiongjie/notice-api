@@ -65,6 +65,7 @@ public class AppConstants {
     public static final HashMap<Integer,String> SMS_REPORT_CODE_STATUS = new HashMap<Integer,String>(16){
         {
             put(0,"发送成功");
+            put(2,"空号");
             put(4,"手机号码无效");
             put(5,"签名不合法");
             put(6,"短信内容超过最大限制");

@@ -38,7 +38,15 @@
         submit_time=#{submit_time}
         where riid=#{msgid};
     </update>
-
+    <update id="updateNoticeTaskResultStatusBatch">
+        update notice.notice_tasks_result_info
+        set send_status=#{status},
+        send_time=#{send_time}
+        where riid in
+        <foreach collection="msgids" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
     <update id="updateNoticeTaskBackInfoStatus">
         update notice.notice_tasks_result_info
         set send_status=#{status},

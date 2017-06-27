@@ -56,7 +56,7 @@ public class TaskResource {
     @GET
     @Consumes({ MediaType.APPLICATION_JSON })
     public Response getAddressesFromJobId(String job_id) throws AppException {
-        String address = noticeTaskService.getAddressesFromJobId(job_id);
+        String address = noticeTaskService.getAddressesFromJobId(job_id,"email");
         slog.info("getAddressesFromJobId:" + address);
         return Response.status(Response.Status.CREATED)
                 .entity(Utils.getRespons()).build();
