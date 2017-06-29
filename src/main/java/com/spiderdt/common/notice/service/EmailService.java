@@ -90,7 +90,7 @@ public class EmailService {
                 //用于解决邮件显示附件名中含有中文
                 ClassPathResource fileName = new ClassPathResource(path);
                 try {
-                    helper.addAttachment(MimeUtility.encodeWord(fileName.getFilename()), fileSystemResource);
+                    helper.addAttachment(MimeUtility.encodeText(fileName.getFilename()), fileSystemResource);
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
                 }
@@ -122,12 +122,13 @@ public class EmailService {
         String taskFileDir = null;
         startTime = System.currentTimeMillis();
         int len = items.size();
+        // 解决附件名过长乱码问题
+        System.getProperties().setProperty("mail.mime.splitlongparameters", "false");
         // 使用 MimeMessage[] 更加高效
         MimeMessage[] mimeMessagesList = new MimeMessage[len];
         for (int i = 0; i < len; i++) {
             NoticeTasksResultEntity item = items.get(i);
             taskId = item.getTaskId();
-//            noticeTaskService.updateNoticeTaskSatus(taskId, AppConstants.TASK_STATUS_SENDING);
             try {
                 sendTime = Jdate.getNowStrTime();
                 mimeMessagesList[i] = sender.createMimeMessage();

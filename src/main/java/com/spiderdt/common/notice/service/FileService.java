@@ -1,14 +1,14 @@
 package com.spiderdt.common.notice.service;
 
 import com.spiderdt.common.notice.common.Jlog;
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
-import java.net.MalformedURLException;
+import javax.net.ssl.*;
+import java.io.File;
 import java.net.URL;
-import java.net.URLConnection;
-
+import java.security.cert.X509Certificate;
 /**
  * @author ranran
  * @version V1.0
@@ -29,42 +29,48 @@ public class FileService {
      * @param taskFileDir 每个 task 一个文件夹
      * @param filename 本地文件名
      */
+    public void download(String urlString, String taskFileDir, String filename) {
+        try {
+            // 关闭 ssl 解决 ip 不能下载文件的问题
+            // Create a trust manager that does not validate certificate chains
+            TrustManager[] trustAllCerts = new TrustManager[] {new X509TrustManager() {
+                public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                    return null;
+                }
+                public void checkClientTrusted(X509Certificate[] certs, String authType) {
+                }
+                public void checkServerTrusted(X509Certificate[] certs, String authType) {
+                }
+            }
+            };
 
-    public void download(String urlString, String taskFileDir, String filename)
-    {
-        try
-        {
-            URL url = new URL(urlString);
-            // 打开连接
-            URLConnection con = url.openConnection();
-            // 输入流
-            InputStream is = con.getInputStream();
-            // 1K的数据缓冲
-            byte[] bs = new byte[1024];
-            // 读取到的数据长度
-            int len;
-            // 输出的文件流s
+            // Install the all-trusting trust manager
+            SSLContext sc = SSLContext.getInstance("SSL");
+            sc.init(null, trustAllCerts, new java.security.SecureRandom());
+            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+
+            // Create all-trusting host name verifier
+            HostnameVerifier allHostsValid = new HostnameVerifier() {
+                public boolean verify(String hostname, SSLSession session) {
+                    return true;
+                }
+            };
+
+            // Install the all-trusting host verifier
+            HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
+
+            // 下载文件
+            URL httpurl = new URL(urlString);
+
+            // 创建目录 taskId
             File saveDir = new File(taskFileDir);
             if (!saveDir.exists()) {
                 saveDir.mkdir();
             }
-            OutputStream os = new FileOutputStream(taskFileDir +"/"+ filename);
-            // 开始读取
-            while ((len = is.read(bs)) != -1) {
-                os.write(bs, 0, len);
-            }
-            // 完毕，关闭所有链接
-            os.close();
-            is.close();
-        }
-        catch (MalformedURLException e)
-        {
-            Jlog.error(e.getMessage());
-            e.printStackTrace();
-        }
-        catch (IOException e)
-        {
-            Jlog.error(e.getMessage());
+            File file = new File(taskFileDir +"/"+ filename);
+            file.createNewFile();
+            FileUtils.copyURLToFile(httpurl, file);
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
