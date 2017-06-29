@@ -63,6 +63,8 @@ public class NoticeTaskService {
     @Autowired
     Sredis sredis;
 
+    @Value("${jupiter.getAddress.url}") String jupiterGetAddressUrl;
+
     @Value("${attachment.storePath}") String attachmentStorePath;
 
     public static final String EMAIL_TYPE = "email";
@@ -191,18 +193,12 @@ public class NoticeTaskService {
 
         String dataSource = "latetime";
 //        String clientUrl = "http://192.168.1.2:8095/";
-//        String url = clientUrl + "jupiter-v1/jupiter/client_info/" + job_id + "?data_source=" + dataSource;
-
 //        String clientUrl = "http://127.0.0.1:8080/";
-        String clientUrl = "http://127.0.0.1:8080/jupiter-api/";
-        String url = clientUrl + "jupiter/client_info/" + job_id + "?data_source=" + dataSource;
+//        String clientUrl = "http://127.0.0.1:8080/jupiter-api/";
+//        String clientUrl = "http://192.168.1.232:8080/jupiter-api/";
+        String url = jupiterGetAddressUrl + job_id + "?data_source=" + dataSource;
 
         JSONObject jsonObject = httpGet(url);
-        // 伪造数据 使用数据库进行伪造数据
-
-//        String testString = "{\"client_info\":[[{\"info_list\":\"[[\"ranbo\",\"13739440552\",\"四川省\",\"资阳市\",\"安岳县\",1,1,0,2]]\"}],[{\"e_mail\":\"1123582921@qq.com\",\"info_list\":\"[[\"马小美\",\"15248806556\",\"黑龙江省\",\"哈尔滨市\",\"道里区\",1,1,0,2]]\"}], [{\"e_mail\":\"1219632773@qq.com\",\"info_list\":\"[[\"吴文丹\",\"13926458551\",\"广东省\",\"广州市\",\"花都区\",1,1,0,2]]\"}],[{\"info_list\":\"[[\"杨丽\",\"18325274451\",\"重庆\",\"重庆市\",\"秀山土家族苗族自治县\",1,1,0,2]]\"}]],\"status\":\"success\"}";
-//        JSONObject jsonObject = JSON.parseObject(testString);
-
 
         List<Object> clientInfo = (List<Object>) jsonObject.get("client_info");
         if(AppConstants.EMAIL_TASK_TYPE.equals(task_type)) {
@@ -492,7 +488,7 @@ public class NoticeTaskService {
                 message = message.replace("#"+entry.getKey()+"#",entry.getValue());     //模版内容替换,URL还未替换
                 subject = (subject== null || subject.isEmpty() == true) ? "":subject.replace("#"+entry.getKey()+"#",entry.getValue());
             }
-//            item.setRiid(Utils.getUUID());
+
             item.setRiid(riid);
             item.setTaskId(task_id);
             //trick
