@@ -123,6 +123,11 @@ public class UtilsTest {
                 "</html>";
 //        html = "this <a href='http://www.baidu.com'>3</a>is email message";
         String taskType = "email";
+
+        html = "1111111111this http://www.baidu.com 3is email message";
+        html = "1111111111this www.baidu.com 3is email message";
+        taskType = "sms";
+
         HashMap<Integer, String> urls = Utils.getUrlsFromMessage(html, taskType);
         for (Map.Entry<Integer, String> entry : urls.entrySet()) {
             System.out.println("Key = " + entry.getKey() + ", Value = "  + entry.getValue());
