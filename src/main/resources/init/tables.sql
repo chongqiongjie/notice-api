@@ -124,7 +124,7 @@ COMMENT ON COLUMN notice.notice_message_template.template_subject IS '消息的�
 COMMENT ON COLUMN notice.notice_message_template.template_content IS '消息的内容，用于sms 和email';
 COMMENT ON COLUMN notice.notice_message_template.create_time IS '创建时间';
 COMMENT ON COLUMN notice.notice_message_template.update_time IS '修改时间';
-COMMENT ON COLUMN notice.notice_message_template.is_valid IS '状态0/1'
+COMMENT ON COLUMN notice.notice_message_template.is_valid IS '状态0/1';
 
 
 DROP TABLE notice.notice_tasks_result_error_info;
