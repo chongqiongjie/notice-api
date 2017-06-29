@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.spiderdt.common.notice.dao.TasksResultDao">
+
+    <resultMap id="TasksResultMap" type="com.spiderdt.common.notice.entity.NoticeTasksResultEntity">
+        <result column="riid" property="riid" jdbcType="NUMERIC" />
+        <result column="task_id" property="taskId" jdbcType="VARCHAR" />
+        <result column="address" property="address" jdbcType="VARCHAR" />
+        <result column="message" property="message" jdbcType="VARCHAR" />
+        <result column="subject" property="subject" jdbcType="VARCHAR" />
+        <result column="send_status" property="sendStatus" jdbcType="VARCHAR" />
+        <result column="detail_info" property="detailInfo" jdbcType="VARCHAR" />
+        <result column="submit_time" property="submitTime" jdbcType="VARCHAR" />
+        <result column="send_time" property="sendTime" jdbcType="VARCHAR" />
+        <result column="back_time" property="backTime" jdbcType="VARCHAR" />
+        <result column="task_type" property="taskType" jdbcType="VARCHAR" />
+        <result column="is_last" property="isLast" jdbcType="BOOLEAN" />
+    </resultMap>
+    <select id="getNewNoticeTaskResultsBatch" resultMap="TasksResultMap" parameterType="String">
+        select result.riid,result.task_id,result.address,result.message,result.subject,tasks.task_type
+        from notice.notice_tasks_result_info  as result
+        join notice.notice_tasks as tasks on (tasks.task_id= result.task_id)
+        where result.send_status =#{status} limit 200;
+    </select>
+    <insert id="createNoticeTaskResultBatch" parameterType="java.util.List">
+        insert into notice.notice_tasks_result_info
+        (riid,task_id,address,message,subject,send_status,submit_time)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+                (#{item.riid},#{item.taskId},
+            #{item.address},#{item.message},#{item.subject},#{item.sendStatus},#{item.submitTime})
+        </foreach>
+    </insert>
+    <update id="updateNoticeTaskResultStatus">
+        update notice.notice_tasks_result_info
+        set send_status=#{status},
+        detail_info=#{detail_info},
+        submit_time=#{submit_time}
+        where riid=#{msgid};
+    </update>
+    <update id="updateNoticeTaskResultStatusBatch">
+        update notice.notice_tasks_result_info
+        set send_status=#{status},
+        send_time=#{send_time}
+        where riid in
+        <foreach collection="msgids" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+    <update id="updateNoticeTaskBackInfoStatus">
+        update notice.notice_tasks_result_info
+        set send_status=#{status},
+        detail_info=#{detail_info},
+        send_time = #{send_time},
+        back_time=#{back_time}
+        where riid=#{msgid};
+    </update>
+
+    <select id="countUnfixedResultByTaskId" resultType="int">
+        SELECT COUNT(*) FROM notice.notice_tasks_result_info
+          WHERE (send_status = #{newStatus} OR send_status = #{authFailedStatus} OR send_status = #{sendingStatus})
+          AND task_id = #{taskId};
+    </select>
+
+    <update id="updateResultWithNextClientInfo">
+        UPDATE notice.notice_tasks_result_info
+        SET address = #{newAddress}
+        WHERE riid = #{riid};
+    </update>
+
+</mapper>
