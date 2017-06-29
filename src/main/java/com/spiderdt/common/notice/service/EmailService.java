@@ -21,6 +21,7 @@ import javax.mail.internet.AddressException;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeUtility;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
@@ -76,7 +77,7 @@ public class EmailService {
      * @param paths  多个附件 path 的集合
      * @param helper
      */
-    public void setAttachments(ArrayList<String> paths, MimeMessageHelper helper) {
+    public void setAttachments(ArrayList<String> paths, MimeMessageHelper helper) throws FileNotFoundException{
         try {
             // 添加附件
             for (String path : paths) {
@@ -126,7 +127,7 @@ public class EmailService {
         for (int i = 0; i < len; i++) {
             NoticeTasksResultEntity item = items.get(i);
             taskId = item.getTaskId();
-            noticeTaskService.updateNoticeTaskSatus(taskId, AppConstants.TASK_STATUS_SENDING);
+//            noticeTaskService.updateNoticeTaskSatus(taskId, AppConstants.TASK_STATUS_SENDING);
             try {
                 sendTime = Jdate.getNowStrTime();
                 mimeMessagesList[i] = sender.createMimeMessage();
@@ -161,6 +162,11 @@ public class EmailService {
                 detailInfo = e.getMessage();
                 sendStatus = AppConstants.TASK_RESULT_STATUS_FAILED;
 
+            } catch (FileNotFoundException e) {
+                Jlog.error("send emailAddress:"+item.getAddress());
+                Jlog.error("send email error:"+e.getMessage());
+                detailInfo = e.getMessage();
+                sendStatus = AppConstants.TASK_RESULT_STATUS_FAILED;
             } catch (Exception e) {
                 // 登录异常会再次选出来发送
                 Jlog.error("send emailAddress:"+item.getAddress());

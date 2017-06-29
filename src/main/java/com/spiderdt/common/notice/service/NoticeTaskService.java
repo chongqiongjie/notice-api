@@ -57,9 +57,16 @@ public class NoticeTaskService {
     @Autowired
     FileService fileService;
 
+    @Autowired
+    Utils utils;
+
+    @Autowired
+    Sredis sredis;
+
     @Value("${attachment.storePath}") String attachmentStorePath;
 
     protected  String json_address_key = "address"; //phone/email
+    protected  String json_riid_key = "riid";
     protected  String url_ac = "click";
     protected  String track_type = "click";
     protected  String image_track_type = "open";
@@ -87,8 +94,6 @@ public class NoticeTaskService {
                 }
             }
 
-            sms_st = smsService.sendSmsBatch(sms_task_list);
-            email_st = emailService.sendEmailBatch(email_task_list);
             Set<Integer> task_ids = Sets.newHashSet();
             List<String> riid_lists = Lists.newArrayList();
             for(NoticeTasksResultEntity item:task_list){
@@ -96,8 +101,9 @@ public class NoticeTaskService {
                 riid_lists.add(item.getRiid());
             }
             updateTaskStatusBatch(task_ids,AppConstants.TASK_STATUS_SENDING);
-            updateTaskResultStatusBatch(riid_lists,AppConstants.TASK_STATUS_SENDING);
-
+            updateTaskResultStatusBatch(riid_lists,AppConstants.TASK_RESULT_STATUS_SENDING);
+            sms_st = smsService.sendSmsBatch(sms_task_list);
+            email_st = emailService.sendEmailBatch(email_task_list);
         }
         slog.info("send notice end:sms:"+sms_st+" email:"+email_st);
     }
@@ -123,12 +129,12 @@ public class NoticeTaskService {
             task_id = noticeTasksEntity.getTaskId();
             //下面创建任务结果详情时有点慢，可以放到线程池中运行。
             slog.debug("create notce task task_id:"+task_id+" :"+noticeTasksEntity);
-            /*
+
             Boolean st_result_info = createTaskResultInfo(task_id,noticeTasksEntity);
             if(st_result_info == false){
                 slog.error("create notice task result info error:"+noticeTasksEntity);
             }
-            */
+
         }catch (Exception ee){
             slog.error("create notice task error:"+ee.getMessage());
             throw new AppException("0","create notice task error");
@@ -170,23 +176,117 @@ public class NoticeTaskService {
      * @return
      * name,phone/email json string
      */
-    public String getAddressesFromJobId(String job_id,String task_type){
+    public String getAddressesFromJobId(String job_id, String task_type){
 
 ////        String ret = "[{\"name\":\"test\",\"address\":\"13458555648\"}]";
 //       // String ret = "[{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"}]";
 //        String ret = "[{\"name\":\"test\",\"address\":\"chong.qiongjie@spiderdt.com\"},{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"}]";
 ////        String ret = "[{\"name\":\"test\",\"address\":\"ran.bo@spiderdt.com\"}, {\"name\":\"test2\",\"address\":\"13458555648@163.com\"}]";
-        if(task_type.equals("email") == true) {
-            String clientUrl = "http://192.168.1.2:8095/";
-            String url = clientUrl + "jupiter-v1/jupiter/client_info/" + job_id + "?data_source=latetime";
-            JSONObject http = httpGet(url);
-            return http.toString();
+
+        String dataSource = "latetime";
+//        String clientUrl = "http://192.168.1.2:8095/";
+//        String url = clientUrl + "jupiter-v1/jupiter/client_info/" + job_id + "?data_source=" + dataSource;
+
+//        String clientUrl = "http://127.0.0.1:8080/";
+        String clientUrl = "http://127.0.0.1:8080/jupiter-api/";
+        String url = clientUrl + "jupiter/client_info/" + job_id + "?data_source=" + dataSource;
+
+        JSONObject jsonObject = httpGet(url);
+        // 伪造数据 使用数据库进行伪造数据
+
+//        String testString = "{\"client_info\":[[{\"info_list\":\"[[\"ranbo\",\"13739440552\",\"四川省\",\"资阳市\",\"安岳县\",1,1,0,2]]\"}],[{\"e_mail\":\"1123582921@qq.com\",\"info_list\":\"[[\"马小美\",\"15248806556\",\"黑龙江省\",\"哈尔滨市\",\"道里区\",1,1,0,2]]\"}], [{\"e_mail\":\"1219632773@qq.com\",\"info_list\":\"[[\"吴文丹\",\"13926458551\",\"广东省\",\"广州市\",\"花都区\",1,1,0,2]]\"}],[{\"info_list\":\"[[\"杨丽\",\"18325274451\",\"重庆\",\"重庆市\",\"秀山土家族苗族自治县\",1,1,0,2]]\"}]],\"status\":\"success\"}";
+//        JSONObject jsonObject = JSON.parseObject(testString);
+
+
+        List<Object> clientInfo = (List<Object>) jsonObject.get("client_info");
+        if(AppConstants.EMAIL_TASK_TYPE.equals(task_type)) {
+            return getEmailAddresses(clientInfo);
+        } else {
+            return getSmsAddresses(clientInfo);
         }
-        Jlog.info("getAddressesFromJobId job_id:" + job_id);
-        slog.debug("getAddressesFromJobId job_id:" + job_id);
-        String ret = "[{\"name\":\"qiong\",\"address\":\"18217168545\"},{\"name\":\"qiong\",\"address\":\"1821716854\"},{\"name\":\"qiong\",\"address\":\"13426007264\"}]";
-        return ret;
+
     }
+
+    public String getEmailAddresses(List<Object> clientInfo) {
+
+        JSONArray personList = new JSONArray();
+        for (int i = 0; i < clientInfo.size(); i++) {
+            JSONObject person = new JSONObject();
+            JSONArray mess_info = (JSONArray) clientInfo.get(i);
+            JSONObject mess_item = (JSONObject) mess_info.get(0);
+
+            String email = (String) mess_item.get("e_mail");
+            String address = (String) mess_item.get("info_list");
+
+            JSONArray items = JSONArray.parseArray(address);
+            for (int j = 0; j < items.size(); j++) {
+                JSONArray subItem = items.getJSONArray(j);
+                String name = subItem.getString(0);
+
+                if (email != null) {
+                    person = getPerson(name, email, utils.getUUID());
+
+                }
+            }
+            if(!person.isEmpty()){
+                personList.add(person);
+            }
+
+        }
+
+        return personList.toString();
+    }
+
+
+    public String getSmsAddresses(List<Object> clientInfo){
+
+        String str = null;
+        JSONArray personList = new JSONArray();
+
+        for(int i = 0; i < clientInfo.size(); i++) {
+            String riid = utils.getUUID();
+
+            JSONArray mess_info = (JSONArray) clientInfo.get(i);
+            JSONObject mess_item = (JSONObject) mess_info.get(0);
+            String singleUserInfo = (String) mess_item.get("info_list");
+
+            JSONArray singleUserInfoArray = JSON.parseArray(singleUserInfo);
+            JSONArray jsonArray = (JSONArray) singleUserInfoArray.get(0);
+            String name = (String) jsonArray.get(0);
+            String phone = (String) jsonArray.get(1);
+            JSONObject person = getPerson(name, phone, riid);
+            if(!person.isEmpty()){
+                personList.add(person);
+            }
+
+            // 将其他电话号码存入缓存
+            singleUserInfoArray.remove(0);
+            if (singleUserInfoArray.isEmpty()) {
+                Jlog.info("该用户:" + name + " 只有一个电话号码，对应的 notice_tasks_result_info 的 riid 为:" + riid);
+            } else {
+                singleUserInfo = singleUserInfoArray.toJSONString();
+                Jlog.info("该用户多个电话号码，存入缓存的剩下的电话信息为:" + singleUserInfo);
+                sredis.addString(riid, singleUserInfo);
+            }
+        }
+        return personList.toString();
+    }
+
+    /**
+     * 单个客户的信息
+     * @param name
+     * @param address phone/email address
+     * @param riid 唯一对应数据库的 notice_tasks_result
+     * @return
+     */
+    public JSONObject getPerson(String name, String address, String riid) {
+        JSONObject person = new JSONObject();
+        person.put("name", name);
+        person.put("address", address);
+        person.put("riid", riid);
+        return person;
+    }
+
 
     /**
      * 通过任务信息，创建任务的具体信息表notice_tasks_result_info。
@@ -376,6 +476,7 @@ public class NoticeTaskService {
 
             NoticeTasksResultEntity item = new NoticeTasksResultEntity();
             String address = address_map.get(this.json_address_key);
+            String riid = address_map.get(this.json_riid_key);
             String message = noticeTasksEntity.getMessage();
             String subject = noticeTasksEntity.getSubject();
             for(Map.Entry<String,String> entry : address_map.entrySet()){
@@ -385,7 +486,8 @@ public class NoticeTaskService {
                 message = message.replace("#"+entry.getKey()+"#",entry.getValue());     //模版内容替换,URL还未替换
                 subject = (subject== null || subject.isEmpty() == true) ? "":subject.replace("#"+entry.getKey()+"#",entry.getValue());
             }
-            item.setRiid(Utils.getUUID());
+//            item.setRiid(Utils.getUUID());
+            item.setRiid(riid);
             item.setTaskId(task_id);
             //trick
             item.setTaskType(noticeTasksEntity.getTaskType());      //主要用于后续流程区分
@@ -508,7 +610,7 @@ public class NoticeTaskService {
      * @return
      */
     public int countUnfixedResultByTaskId(int taskId) {
-        int count = tasksResultDao.countUnfixedResultByTaskId(taskId, AppConstants.TASK_STATUS_NEW, AppConstants.TASK_RESULT_STATUS_AUTH_FAILED);
+        int count = tasksResultDao.countUnfixedResultByTaskId(taskId, AppConstants.TASK_RESULT_STATUS_NEW, AppConstants.TASK_RESULT_STATUS_AUTH_FAILED, AppConstants.TASK_RESULT_STATUS_SENDING);
         return count;
     }
 
@@ -548,4 +650,13 @@ public class NoticeTaskService {
         }
     }
 
+    /**
+     * 电话号码有误,使用下一个电话号码更新当前号码
+     * @param newAddress
+     * @param riid
+     * @return
+     */
+    public void updateResultWithNextClientInfo(String newAddress, String riid) {
+        tasksResultDao.updateResultWithNextClientInfo(newAddress, riid);
+    };
 }

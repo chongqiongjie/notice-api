@@ -120,3 +120,21 @@ COMMENT ON COLUMN notice.notice_message_template.template_content IS '消息的�
 COMMENT ON COLUMN notice.notice_message_template.create_time IS '创建时间';
 COMMENT ON COLUMN notice.notice_message_template.update_time IS '修改时间';
 COMMENT ON COLUMN notice.notice_message_template.is_valid IS '状态0/1'
+
+
+DROP TABLE notice.notice_tasks_result_error_info;
+create table if not exists notice.notice_tasks_result_error_info(
+  task_id int not null,
+  riid text,
+  address text,
+  send_status text,
+  detail_info text,
+  back_time varchar(255)
+);
+COMMENT ON TABLE notice.notice_tasks_result_error_info IS '发送信息任务表错误详细状态表';
+COMMENT ON COLUMN notice.notice_tasks_result_error_info.task_id IS '任务id';
+COMMENT ON COLUMN notice.notice_tasks_result_error_info.address IS '发送的单独的手机号/email';
+COMMENT ON COLUMN notice.notice_tasks_track_recode.riid IS '所属任务的riid';
+COMMENT ON COLUMN notice.notice_tasks_result_error_info.send_status IS '发送状态';
+COMMENT ON COLUMN notice.notice_tasks_result_error_info.detail_info IS '详细信息包括错误信息等';
+COMMENT ON COLUMN notice.notice_tasks_result_error_info.back_time IS '反馈时间';
