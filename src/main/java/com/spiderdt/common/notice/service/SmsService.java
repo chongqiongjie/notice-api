@@ -122,15 +122,7 @@ public class SmsService extends  NoticeTaskService {
         Jlog.debug("deal sms result:"+http_rets.toJSONString() +" and:"+smsRespEntity.toString());
         String submitTime = Jdate.getNowStrTime();
         try {
-
-//            String status = AppConstants.TASK_RESULT_STATUS_NEW;
-//            if (smsRespEntity.getResult().equals("0") == false) {
-//                status = AppConstants.TASK_RESULT_STATUS_FAILED;
-//            }
             String detailInfo =  AppConstants.SMS_SUBMIT_CODE_STATUS.get(Integer.valueOf(smsRespEntity.getResult()));
-            for(SmsReqEntity.SmsMsgEntity item: send_patch){
-                tasksResultDao.updateNoticeTaskResultStatus( item.getMsgid(), AppConstants.TASK_RESULT_STATUS_NEW, detailInfo, submitTime);
-            }
             if (smsRespEntity.getResult().equals("0") == true) {
                 if (smsRespEntity.getData().size() > 0) {
                     List<SmsRespEntity.SmsRespDataEntity> items = smsRespEntity.getData();
