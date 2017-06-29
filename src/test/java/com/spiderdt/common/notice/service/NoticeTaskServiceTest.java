@@ -1,8 +1,12 @@
 package com.spiderdt.common.notice.service;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Sets;
 import com.spiderdt.common.notice.common.AppConstants;
 import com.spiderdt.common.notice.common.Jlog;
+import com.spiderdt.common.notice.common.Sredis;
 import com.spiderdt.common.notice.entity.NoticeTasksEntity;
 import com.spiderdt.common.notice.errorhander.AppException;
 import org.junit.Test;
@@ -27,6 +31,9 @@ public class NoticeTaskServiceTest {
 
     @Autowired
     NoticeTaskService noticeTaskService;
+
+    @Autowired
+    Sredis sredis;
 
     @Test
     public void sendNoticeTaskByDbScan() throws Exception {
@@ -80,8 +87,9 @@ public class NoticeTaskServiceTest {
 
     @Test
     public void getAddressesFromJobId() throws Exception {
-       String job_id = "latetime_feature2_20161101_20161115";
+        String job_id = "latetime_feature2_20161101_20161115";
         System.out.println(noticeTaskService.getAddressesFromJobId(job_id,"email"));
+        System.out.println(noticeTaskService.getAddressesFromJobId(job_id,"sms"));
     }
 
     @Test
@@ -162,5 +170,87 @@ public class NoticeTaskServiceTest {
         task_ids.add(146);
         task_ids.add(145);
         noticeTaskService.updateTaskStatusBatch(task_ids, AppConstants.TASK_STATUS_SENDING);
+    }
+
+    @Test
+    public void getAddressesFromJobId2() throws Exception {
+        String job_id = "latetime_feature2_20161101_20161115";
+
+        JSONArray ret = new JSONArray();
+
+        String clientInfo = noticeTaskService.getAddressesFromJobId(job_id,"email");
+        System.out.println(clientInfo);
+
+        JSONObject clientInfoJson = (JSONObject) JSON.parse(clientInfo);
+        System.out.println(clientInfoJson);
+        System.out.println(clientInfoJson.get("client_info"));
+
+        JSONArray emailAndPhoneArray = (JSONArray) clientInfoJson.get("client_info");
+        System.out.println(emailAndPhoneArray);
+        for (int i = 0; i < emailAndPhoneArray.size(); i++) {
+            JSONArray emailAndPhoneArray2 = emailAndPhoneArray.getJSONArray(i);
+            for (int j = 0; j < emailAndPhoneArray2.size(); j++) {
+                JSONObject o = emailAndPhoneArray2.getJSONObject(j);
+                System.out.println(o.get("info_list"));
+//                System.out.println(o.get("info_list").getClass());
+                String email = (String) o.get("e_mail");
+                if(email != null) {
+                    System.out.println(email);
+                }
+
+                JSONArray emailAndPhoneArray3 = JSON.parseArray((String) o.get("info_list"));
+                emailAndPhoneArray3.remove(0);
+                if (emailAndPhoneArray3.size() == 0) {
+                    System.out.println("已经取完了");
+                }
+                for (int k = 0; k < emailAndPhoneArray3.size(); k++) {
+//                    System.out.println(emailAndPhoneArray3.get(k));
+//                    System.out.println(emailAndPhoneArray3.get(k).getClass());
+                    JSONArray jsonArray = (JSONArray) emailAndPhoneArray3.get(k);
+                    String name = (String) jsonArray.get(0);
+                    String phone = (String) jsonArray.get(1);
+                    System.out.println("name:" + name + " address:" + phone);
+                }
+            }
+        }
+
+
+    }
+
+    @Test
+    public void redisTest() {
+//        String singleUserInfo = "[[\"张旭昊\",\"18936255608\",\"江苏省\",\"扬州市\",\"江都区\",1,0,0,1],[\"袁雨静\",\"15062867110\",\"江苏省\",\"扬州市\",\"江都区\",1,0,0,1]]";
+//        String singleUserInfo = "[[\"张旭昊\",\"18936255608\",\"江苏省\",\"扬州市\",\"江都区\",1,0,0,1]]";
+        String singleUserInfo = "[]";
+        String riid = "keyRiid";
+        sredis.addString(riid, singleUserInfo);
+//        sredis.addString(riid, "testValue");
+
+        singleUserInfo = sredis.getString(riid);
+        System.out.println(singleUserInfo);
+
+        if ("[]".equals(singleUserInfo)) {
+            System.out.println("取完了");
+            return;
+        }
+
+        JSONArray singleUserInfoArray = JSON.parseArray(singleUserInfo);
+        System.out.println(singleUserInfoArray);
+        JSONArray jsonArray = (JSONArray) singleUserInfoArray.get(0);
+        String name = (String) jsonArray.get(0);
+        String phone = (String) jsonArray.get(1);
+        singleUserInfoArray.remove(0);
+        singleUserInfo = singleUserInfoArray.toJSONString();
+        sredis.addString(riid, singleUserInfo);
+        singleUserInfo = sredis.getString(riid);
+        System.out.println(singleUserInfo);
+    }
+
+
+    @Test
+    public void redisTest2() {
+        System.out.println(sredis.getString("0f5985d69fb94ae4a60c70dd790c7f66")); // null
+        System.out.println(sredis.getString("bdad48caa3dc479ebeefece8f4b7eb06")); // [["test晨","13458555648","安徽省","宣城市","郎溪县",1,0,0,1]]
+        System.out.println(sredis.getString("679ea0601ee3426a8be61a4b383f4d4e"));
     }
 }
