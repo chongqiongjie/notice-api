@@ -65,6 +65,10 @@ public class NoticeTaskService {
 
     @Value("${attachment.storePath}") String attachmentStorePath;
 
+    public static final String EMAIL_TYPE = "email";
+    public static final String SMS_TYPE = "sms";
+
+
     protected  String json_address_key = "address"; //phone/email
     protected  String json_riid_key = "riid";
     protected  String url_ac = "click";
@@ -156,7 +160,9 @@ public class NoticeTaskService {
                 fileService.download(downloadUrl, taskFileDir, fileName);
             }
         }
-        slog.debug("create notice task main end and wait for notice task result create");
+        slog.debug("create notice task end and update status to new");
+        noticeTasksDao.updateNoticeTaskStatus(task_id,AppConstants.TASK_RESULT_STATUS_NEW,Jdate.getNowStrTime());       //全部创建成功之后，再修改成new的状态，否则会被另一个进程调度到。
+
         return true;
     }
 
