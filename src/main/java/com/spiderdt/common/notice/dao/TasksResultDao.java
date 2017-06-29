@@ -66,6 +66,21 @@ public interface TasksResultDao {
      * @param authFailedStatus
      * @return
      */
-    public int countUnfixedResultByTaskId(@Param("taskId") int taskId, @Param("newStatus") String newStatus, @Param("authFailedStatus") String authFailedStatus);
+    public int countUnfixedResultByTaskId(@Param("taskId") int taskId, @Param("newStatus") String newStatus, @Param("authFailedStatus") String authFailedStatus, @Param("sendingStatus") String sendingStatus);
 
+    /**
+     * 电话号码有误,使用下一个电话号码更新当前号码
+     * @param newAddress
+     * @param riid
+     * @return
+     */
+    public boolean updateResultWithNextClientInfo(@Param("newAddress") String newAddress, @Param("riid") String riid);
+
+
+    /**
+     * 通过 riid 获取 taskId
+     * @param riid
+     * @return taskId
+     */
+    public int getTaskIdByRiid(@Param("riid") String riid);
 }
