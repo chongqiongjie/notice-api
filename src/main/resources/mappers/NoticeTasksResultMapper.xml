@@ -58,8 +58,18 @@
 
     <select id="countUnfixedResultByTaskId" resultType="int">
         SELECT COUNT(*) FROM notice.notice_tasks_result_info
-          WHERE (send_status = #{newStatus} OR send_status = #{authFailedStatus})
+          WHERE (send_status = #{newStatus} OR send_status = #{authFailedStatus} OR send_status = #{sendingStatus})
           AND task_id = #{taskId};
+    </select>
+
+    <update id="updateResultWithNextClientInfo">
+        UPDATE notice.notice_tasks_result_info
+        SET address = #{newAddress}
+        WHERE riid = #{riid};
+    </update>
+
+    <select id="getTaskIdByRiid" resultType="int">
+        SELECT task_id FROM notice.notice_tasks_result_info WHERE riid = #{riid};
     </select>
 
 </mapper>

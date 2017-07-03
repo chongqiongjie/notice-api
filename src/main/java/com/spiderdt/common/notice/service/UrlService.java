@@ -37,8 +37,8 @@ public class UrlService {
     @Resource
     private Sredis sredis;
 
-    @Value("${track.host}")
-    public String track_host ;
+    @Value("${track.url}")
+    public String trackUrl;
 
     /**
      * make 跟踪URL的后缀部分。
@@ -58,7 +58,7 @@ public class UrlService {
         return suffix_encode_part;
     }
     public String getCompleteTrackUrl(String suffix){
-        return track_host+suffix;
+        return trackUrl +suffix;
     }
 
     /**

@@ -21,6 +21,7 @@ import javax.mail.internet.AddressException;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeUtility;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
@@ -76,7 +77,7 @@ public class EmailService {
      * @param paths  多个附件 path 的集合
      * @param helper
      */
-    public void setAttachments(ArrayList<String> paths, MimeMessageHelper helper) {
+    public void setAttachments(ArrayList<String> paths, MimeMessageHelper helper) throws FileNotFoundException{
         try {
             // 添加附件
             for (String path : paths) {
@@ -89,7 +90,7 @@ public class EmailService {
                 //用于解决邮件显示附件名中含有中文
                 ClassPathResource fileName = new ClassPathResource(path);
                 try {
-                    helper.addAttachment(MimeUtility.encodeWord(fileName.getFilename()), fileSystemResource);
+                    helper.addAttachment(MimeUtility.encodeText(fileName.getFilename()), fileSystemResource);
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
                 }
@@ -121,6 +122,8 @@ public class EmailService {
         String taskFileDir = null;
         startTime = System.currentTimeMillis();
         int len = items.size();
+        // 解决附件名过长乱码问题
+        System.getProperties().setProperty("mail.mime.splitlongparameters", "false");
         // 使用 MimeMessage[] 更加高效
         MimeMessage[] mimeMessagesList = new MimeMessage[len];
         for (int i = 0; i < len; i++) {
@@ -160,6 +163,11 @@ public class EmailService {
                 detailInfo = e.getMessage();
                 sendStatus = AppConstants.TASK_RESULT_STATUS_FAILED;
 
+            } catch (FileNotFoundException e) {
+                Jlog.error("send emailAddress:"+item.getAddress());
+                Jlog.error("send email error:"+e.getMessage());
+                detailInfo = e.getMessage();
+                sendStatus = AppConstants.TASK_RESULT_STATUS_FAILED;
             } catch (Exception e) {
                 // 登录异常会再次选出来发送
                 Jlog.error("send emailAddress:"+item.getAddress());

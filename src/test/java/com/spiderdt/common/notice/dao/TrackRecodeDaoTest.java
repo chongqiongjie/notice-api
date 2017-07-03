@@ -28,7 +28,7 @@ public class TrackRecodeDaoTest {
     public void testTrackRecodeDao() throws Exception {
         long updateTime = new Date().getTime();
 
-        boolean result = trackRecodeDao.updateTrackRecodeStatus("2CAC3CB01D27CD03A63B856DE49CA6BA", 5, (new Timestamp(updateTime).toString()));
+        boolean result = trackRecodeDao.updateTrackRecodeStatus("track_url_suffix_test", 5, (new Timestamp(updateTime).toString()));
         System.out.println(result);
     }
 

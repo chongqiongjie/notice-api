@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.spiderdt.common.notice.dao.TasksResultErrorDao">
+
+    <insert id="insertOneIntoResultError" parameterType="com.spiderdt.common.notice.entity.NoticeTasksResultErrorEntity">
+        INSERT INTO notice.notice_tasks_result_error_info
+        (task_id, address, send_status, detail_info, back_time)
+        VALUES (#{taskId}, #{address}, #{sendStatus}, #{detailInfo}, #{backTime});
+    </insert>
+
+
+</mapper>

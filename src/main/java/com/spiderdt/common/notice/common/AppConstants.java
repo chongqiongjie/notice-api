@@ -18,6 +18,7 @@ public class AppConstants {
     public static final String TASK_STATUS_SENDED = "sended";
 
     public static final String TASK_RESULT_STATUS_NEW = "new";
+    public static final String TASK_RESULT_STATUS_SENDING = "sending";
     public static final String TASK_RESULT_STATUS_SUCCESS = "success";
     public static final String TASK_RESULT_STATUS_AUTH_FAILED = "authFailed";
     public static final String TASK_RESULT_STATUS_FAILED = "failed";
