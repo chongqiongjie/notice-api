@@ -79,11 +79,18 @@ public class NoticeTaskServiceTest {
     }
 
     @Test
-    public void getAddressesFromJobId() throws Exception {
+    public void getSmsAddressesFromJobId() throws Exception {
        String job_id = "latetime_feature2_20161101_20161115";
-       String task_type = NoticeTaskService.SMS_TYPE;
-        System.out.println(noticeTaskService.getAddressesFromJobId(job_id,task_type));
+       System.out.println(noticeTaskService.getSmsAddressesFromJobId(job_id));
     }
+
+
+    @Test
+    public void getEmailAddressesFromJobId() throws Exception {
+        String job_id = "latetime_feature2_20161101_20161115";
+        System.out.println(noticeTaskService.getEmailAddressesFromJobId(job_id));
+    }
+
 
     @Test
     public void createTaskResultInfo() throws Exception {

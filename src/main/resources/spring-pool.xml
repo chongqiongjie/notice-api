@@ -21,19 +21,19 @@
         <property name="waitForTasksToCompleteOnShutdown" value="true"/>
     </bean>
 
-    <bean id="syncSmsStatusScheduleExecutor" class="com.spiderdt.common.notice.task.ScheduleSyncSmsSendStatusTask"> </bean>
+    <!--<bean id="syncSmsStatusScheduleExecutor" class="com.spiderdt.common.notice.task.ScheduleSyncSmsSendStatusTask"> </bean>-->
 
     <bean id="noticeSendTaskScheduleExecutor" class="com.spiderdt.common.notice.task.ScheduleNoticeSendTask"> </bean>
 
-    <bean id="createNoticeResultSchedulerExecutor" class="com.spiderdt.common.notice.task.DefaultCreateNoticeResultTask"></bean>
+    <!--<bean id="createNoticeResultSchedulerExecutor" class="com.spiderdt.common.notice.task.DefaultCreateNoticeResultTask"></bean>-->
 
-    <bean id="syncSmsSendStatusScheduleExecutorTask" class="org.springframework.scheduling.concurrent.ScheduledExecutorTask">
-        <property name="runnable" ref="syncSmsStatusScheduleExecutor" />
-        <!-- 容器加载60秒后开始执行 -->
-        <property name="delay" value="60000" />
-        <!-- 每次任务间隔 30秒-->
-        <property name="period" value="30000" />
-    </bean>
+    <!--<bean id="syncSmsSendStatusScheduleExecutorTask" class="org.springframework.scheduling.concurrent.ScheduledExecutorTask">-->
+        <!--<property name="runnable" ref="syncSmsStatusScheduleExecutor" />-->
+        <!--&lt;!&ndash; 容器加载60秒后开始执行 &ndash;&gt;-->
+        <!--<property name="delay" value="60000" />-->
+        <!--&lt;!&ndash; 每次任务间隔 30秒&ndash;&gt;-->
+        <!--<property name="period" value="30000" />-->
+    <!--</bean>-->
     <bean id="noticeSendTaskScheduleExecutorTask" class="org.springframework.scheduling.concurrent.ScheduledExecutorTask">
         <property name="runnable" ref="noticeSendTaskScheduleExecutor" />
         <!-- 容器加载60秒后开始执行 -->
@@ -42,21 +42,21 @@
         <property name="period" value="45000" />
     </bean>
 
-    <bean id="createNoticeResultScheduleExecutorTask" class="org.springframework.scheduling.concurrent.ScheduledExecutorTask">
-        <property name="runnable" ref="createNoticeResultSchedulerExecutor" />
-        <!-- 容器加载60秒后开始执行 -->
-        <property name="delay" value="60000" />
-        <!-- 每次任务间隔 10秒-->
-        <property name="period" value="10000" />
-    </bean>
+    <!--<bean id="createNoticeResultScheduleExecutorTask" class="org.springframework.scheduling.concurrent.ScheduledExecutorTask">-->
+        <!--<property name="runnable" ref="createNoticeResultSchedulerExecutor" />-->
+        <!--&lt;!&ndash; 容器加载60秒后开始执行 &ndash;&gt;-->
+        <!--<property name="delay" value="60000" />-->
+        <!--&lt;!&ndash; 每次任务间隔 10秒&ndash;&gt;-->
+        <!--<property name="period" value="10000" />-->
+    <!--</bean>-->
 
     <bean id="springScheduledExecutorFactoryBean" class="org.springframework.scheduling.concurrent.ScheduledExecutorFactoryBean">
         <property name="poolSize" value="5" />
         <property name="scheduledExecutorTasks">
             <list>
-                <ref bean="syncSmsSendStatusScheduleExecutorTask" />
+                <!--<ref bean="syncSmsSendStatusScheduleExecutorTask" />-->
                 <ref bean="noticeSendTaskScheduleExecutorTask" />
-                <ref bean="createNoticeResultScheduleExecutorTask" />
+                <!--<ref bean="createNoticeResultScheduleExecutorTask" />-->
             </list>
         </property>
     </bean>
