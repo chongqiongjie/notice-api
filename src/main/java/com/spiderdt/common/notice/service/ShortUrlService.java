@@ -83,7 +83,6 @@ public class ShortUrlService {
 
         String url = "https://api.weibo.com/2/short_url/shorten.json?" + "access_token=" + ak ;
 
-
         int i = 0;
         StringBuilder requestUrl = new StringBuilder(url);
         System.out.println("requestUrl:" + requestUrl);
